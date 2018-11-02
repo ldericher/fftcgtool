@@ -126,7 +126,7 @@ class Opus:
             sheet = Image.new("RGB", (c*w, r*h))
             logger.info("New image: %dx%d" % sheet.size)
 
-            # beware concurrent writes
+            # beware concurrent paste
             sheet_lock = threading.Lock()
 
             # start multithreading, wait for finish
