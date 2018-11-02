@@ -2,31 +2,23 @@ import requests
 
 from PIL import Image
 from io import BytesIO
-from lxml import etree
+import json
 
-# Base-URL of fftcgmognet card pages
-TCGMOGURL = "http://www.fftcgmognet.com/card/"
+# Base-URL of ffdecks card pages
+FFDECKURL = "https://ffdecks.com/api/cards?alternates=1&serial_number={}"
 # Card back image by Aurik
 BACKURL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
-
-# Possible rarity suffixes
-RARITIES = ["C", "R", "H", "L", "S"]
-
-# If fftcgmognet alters designs, these *might* get old
-XP_IMAGEURL = 'string(//div[@class="col-xs-12 col-sm-5 text-center mog-cardpage-image"]//img/@src)'
-XP_CARDNAME = 'string(//div[@class="col-xs-12 col-sm-7 box mog-cardpage-props"]/div[@class="row"][1]/div[2])'
-XP_ELEMENT  = 'string(//div[@class="col-xs-12 col-sm-7 box mog-cardpage-props"]/div[@class="row"][3]/div[2])'
-XP_DESCRIPT = 'string(//div[@class="col-xs-12 col-sm-7 box mog-cardpage-props"]/div[@class="row"][7]/div[2])'
-
+# Card front by Square API
+FACEURL = "https://fftcg.square-enix-games.com/theme/tcg/images/cards/full/{}_eg.jpg"
 
 class Card:
     # 'Shinra' (Wind, 6-048C)
     def __str__(self):
         return "'{}' ({}, {})".format(self._name, self._element, self.get_id())
 
-    # 6-048C
+    # 6-048
     def get_id(self):
-        return "{}-{:03}{}".format(self._opus, self._cardid, self._rarity)
+        return "{}-{:03}".format(self._opus, self._cardid)
 
     # find card
     def load(self, opus, cardid):
@@ -41,26 +33,24 @@ class Card:
             self._iurl = BACKURL
             return True
 
-        # rarity was not given (but needed for mognet URL!)
-        for rarity in RARITIES:
-            # assume some rarity
-            self._rarity = rarity
+        try:
+            # fetch card page from ffdecks API
+            result = requests.get( FFDECKURL.format(self.get_id()) )
+            res_obj = json.loads( result.content.decode("utf-8") )
 
-            # try to fetch card name
-            html = requests.get(TCGMOGURL + self.get_id())
-            doc = etree.HTML(html.content)
-            cname = doc.xpath(XP_CARDNAME).strip()
+            cname = res_obj["name"].strip()
 
-            # succeed or retry with next rarity tier
+            # success?
             if cname:
                 self._name = cname
-                self._iurl = doc.xpath(XP_IMAGEURL).strip()
-                self._element = doc.xpath(XP_ELEMENT).strip()
-                self._description = doc.xpath(XP_DESCRIPT).strip()
+                self._iurl = res_obj["image"]
+                self._element = res_obj["element"]
+                self._description = "\n\n".join(res_obj["abilities"])
                 return True
 
-        # No fitting rarity found,
-        return False
+        except:
+            # Something went wrong
+            return False
 
     # return in dictionary format
     def get_dict(self):

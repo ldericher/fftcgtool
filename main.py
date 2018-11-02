@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 # base config
-opusid = 6
+opusid = 7 # opus prefix
+num_threads = 16 # maximum concurrent requests
+opus_size = 500 # maximum card count per opus
 
 # constants
 grid = 7, 10    # default in TTsim: 7 rows, 10 columns
-reso = 480, 670 # default in TTsim: 480x670 pixels per card
+reso = 429, 600 # default in TTsim: 480x670 pixels per card
 
 # set up logging
 import logging
@@ -21,11 +23,11 @@ os.chdir("out")
 # load an Opus
 from opus import Opus
 myOpus = Opus()
-myOpus.load(opusid, 2, 2)
+myOpus.load(opusid, opus_size, num_threads)
 
 # compose custom deck images
 faceurls = []
-for i, image in enumerate(myOpus.get_images(grid, reso)):
+for i, image in enumerate(myOpus.get_images(grid, reso, num_threads)):
     filename = "opus_%d_%d.jpg" % (opusid, i)
     image.save(filename)
     # ask for upload
