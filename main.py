@@ -81,6 +81,12 @@ def main():
             json_data = myOpus.get_json(args.opusid, "/".join(elements), GRID, cardfilter, faceurls)
             json_file.write(json_data)
 
+    json_filename = "fullopus_{}.json".format(args.opusid)
+    with open(json_filename, "w") as json_file:
+        cardfilter = lambda card: True
+        json_data = myOpus.get_json(args.opusid, "full", GRID, cardfilter, faceurls)
+        json_file.write(json_data)
+
     # Bye
     logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
     logging.info("Thanks for using fftcgtool!")

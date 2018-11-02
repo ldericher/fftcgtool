@@ -53,6 +53,11 @@ class Opus:
             card = Card(card_data)
             self._cards.append(card)
 
+        # sort every element alphabetically
+        self._cards.sort(key=lambda x: x._serial)
+        self._cards.sort(key=lambda x: x._name)
+        self._cards.sort(key=lambda x: x._element)
+
     def __get_sheets(self, grid):
         # cards per sheet
         count = grid[0]*grid[1] - 1
