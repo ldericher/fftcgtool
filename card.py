@@ -66,7 +66,11 @@ class Card:
 
     # download and resize card image
     def get_image(self, resolution):
-        response = requests.get(self._iurl)
+        try:
+            response = requests.get(self._iurl)
+        except:
+            return False
+
         im = Image.open(BytesIO(response.content))
         im = im.convert("RGB")
         im = im.resize(resolution, Image.BICUBIC)

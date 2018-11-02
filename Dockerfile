@@ -18,4 +18,4 @@ WORKDIR "/app"
 
 COPY . .
 
-CMD ["./main.py"]
+ENTRYPOINT ["./main.py"]
