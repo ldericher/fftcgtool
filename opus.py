@@ -27,9 +27,12 @@ class imageLoader(threading.Thread):
             # take next card
             i, card = self.__queue.get()
 
-            # fetch card image
-            logger.info("get image for card {}".format(card))
-            im = card.get_image(self.__resolution)
+            # fetch card image (retry on fail)
+            while True:
+                logger.info("get image for card {}".format(card))
+                im = card.get_image(self.__resolution)
+                if im:
+                    break
 
             # paste image in correct position
             self.__lock.acquire()
