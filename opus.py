@@ -3,36 +3,8 @@ import threading
 import logging
 import json
 
-from card import Card
+from card import Card, BACKURL
 from PIL import Image
-
-
-# multithreaded card loading
-class cardLoader(threading.Thread):
-    def __init__(self, opusid, queue, cards):
-        threading.Thread.__init__(self)
-        self.__opusid = opusid
-        self.__queue = queue
-        self.__cards = cards
-
-    def run(self):
-        logger = logging.getLogger(__name__)
-        while not self.__queue.empty():
-            # take next card number
-            cardid = self.__queue.get()
-
-            # try to load that card
-            card = Card()
-            if card.load(self.__opusid, cardid):
-                # success!
-                self.__cards.append(card)
-                logger.info("found %s" % (card))
-            else:
-                # seems like the end of this opus!
-                logger.info("exiting")
-                break
-        if self.__queue.empty():
-            logger.warn("empty queue, maxsize might be too small!")
 
 
 # multithreaded card image loading
@@ -56,13 +28,13 @@ class imageLoader(threading.Thread):
             i, card = self.__queue.get()
 
             # fetch card image
-            logger.info("get image for card %s" % (card))
+            logger.info("get image for card {}".format(card))
             im = card.get_image(self.__resolution)
 
             # paste image in correct position
             self.__lock.acquire()
             x, y = (i % c) * w, (i // c) * h
-            logger.info("paste image %s at P%d(%d, %d)" % (im.mode, i, x, y))
+            logger.info("paste image {} at P{}({}, {})".format(im.mode, i, x, y))
             self.__composite.paste(im, (x, y, x+w, y+h))
             self.__lock.release()
 
@@ -71,26 +43,12 @@ class imageLoader(threading.Thread):
 
 
 class Opus:
-    def load(self, opusid, maxsize=500, threadnum=16):
-        self._opusid = opusid
+    def __init__(self, data):
         self._cards = []
 
-        # enqueue all card ids
-        idQueue = queue.Queue()
-        for cardid in range(1, maxsize + 1):
-            idQueue.put(cardid)
-
-        # start multithreading, wait for finish
-        threads = [cardLoader(opusid, idQueue, self._cards) for _ in range(threadnum)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
-
-        # sort every element alphabetically
-        self._cards.sort(key=lambda x: x._cardid)
-        self._cards.sort(key=lambda x: x._name)
-        self._cards.sort(key=lambda x: x._element)
+        for card_data in data:
+            card = Card(card_data)
+            self._cards.append(card)
 
     def __get_sheets(self, grid):
         # cards per sheet
@@ -118,13 +76,12 @@ class Opus:
                 cardQueue.put((i, card))
 
             # add hidden face
-            hidden = Card()
-            hidden.load(0, 0)
+            hidden = Card(0)
             cardQueue.put((r * c - 1, hidden))
 
             # create a new card sheet
             sheet = Image.new("RGB", (c*w, r*h))
-            logger.info("New image: %dx%d" % sheet.size)
+            logger.info("New image: {}x{}".format(*sheet.size))
 
             # beware concurrent paste
             sheet_lock = threading.Lock()
@@ -137,18 +94,13 @@ class Opus:
             # sheet image is generated, return now
             yield sheet
 
-    def get_json(self, deckname, grid, cardfilter, faceurls):
+    def get_json(self, opusid, deckname, grid, cardfilter, faceurls):
         # shorthands
         r, c = grid       # rows and columns per sheet
 
-        # get BackURL
-        back = Card()
-        back.load(0, 0)
-        backurl = back._iurl
-
         jsondict = { "ObjectStates": [ {
             "Name": "Deck",
-            "Nickname": "Opus %d %s" % (self._opusid, deckname),
+            "Nickname": "Opus {} {}".format(opusid, deckname),
             "Description": "",
 
             "Transform": {
@@ -181,7 +133,7 @@ class Opus:
             # recurring sheet dictionary
             sheetdict = { str(sheetnum): {
                 "FaceURL": faceurl,
-                "BackURL": backurl,
+                "BackURL": BACKURL,
                 "NumWidth": c,
                 "NumHeight": r
             } }
