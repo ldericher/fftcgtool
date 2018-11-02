@@ -2,55 +2,44 @@ import requests
 
 from PIL import Image
 from io import BytesIO
-import json
 
-# Base-URL of ffdecks card pages
-FFDECKURL = "https://ffdecks.com/api/cards?alternates=1&serial_number={}"
-# Card back image by Aurik
-BACKURL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
 # Card front by Square API
 FACEURL = "https://fftcg.square-enix-games.com/theme/tcg/images/cards/full/{}_eg.jpg"
 
+# Card back image by Aurik
+BACKURL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
+
 class Card:
+    def __init__(self, data):
+        # check if this is a card back
+        if data == 0:
+            self._serial = "0-000"
+            self._name = "[cardback]"
+            self._rarity = "X"
+            self._element = "None"
+
+            self._description = "None"
+            self._iurl = BACKURL
+
+        # else import from data
+        else:
+            self._serial = data["serial_number"]
+            self._name = data["name"]
+            self._rarity = data["rarity"][0]
+            self._element = data["element"]
+
+            self._description = "\n\n".join(data["abilities"])
+            self._iurl = FACEURL.format(self.get_id()) # official url
+            #self._iurl = data["image"] # ffdecks url
+
     # 'Shinra' (Wind, 6-048C)
     def __str__(self):
         return "'{}' ({}, {})".format(self._name, self._element, self.get_id())
 
-    # 6-048
+    # 6-048C
     def get_id(self):
-        return "{}-{:03}".format(self._opus, self._cardid)
-
-    # find card
-    def load(self, opus, cardid):
-        self._opus = opus
-        self._cardid = cardid
-
-        # check if this is a card back
-        if opus == 0:
-            self._rarity = ""
-            self._name = "[cardback]"
-            self._element = "None"
-            self._iurl = BACKURL
-            return True
-
-        try:
-            # fetch card page from ffdecks API
-            result = requests.get( FFDECKURL.format(self.get_id()) )
-            res_obj = json.loads( result.content.decode("utf-8") )
-
-            cname = res_obj["name"].strip()
-
-            # success?
-            if cname:
-                self._name = cname
-                self._iurl = res_obj["image"]
-                self._element = res_obj["element"]
-                self._description = "\n\n".join(res_obj["abilities"])
-                return True
-
-        except:
-            # Something went wrong
-            return False
+        rarity = self._rarity if self._rarity in ["C", "R", "H", "L", "S"] else ""
+        return "{}{}".format(self._serial, rarity)
 
     # return in dictionary format
     def get_dict(self):
