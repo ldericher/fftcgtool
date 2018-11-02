@@ -2,7 +2,7 @@
 
 # base config
 opusid = 7 # opus prefix
-num_threads = 16 # maximum concurrent requests
+num_threads = 8 # maximum concurrent requests
 opus_size = 500 # maximum card count per opus
 
 # constants
