@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 
 # Card front by Square API
-FACEURL = "https://fftcg.square-enix-games.com/theme/tcg/images/cards/full/{}_eg.jpg"
+FACEURL = "https://fftcg.cdn.sewest.net/images/cards/full/{}_eg.jpg"
 
 # Card back image by Aurik
 BACKURL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
