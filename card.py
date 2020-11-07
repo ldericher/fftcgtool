@@ -17,6 +17,7 @@ class Card:
             self._name = "[cardback]"
             self._rarity = "X"
             self._element = "None"
+            self._elements = None
 
             self._description = "None"
             self._iurl = BACKURL
@@ -27,6 +28,17 @@ class Card:
             self._name = data["name"]
             self._rarity = data["rarity"][0]
             self._element = data["element"]
+
+            # handle multi element cards
+            if len(data["elements"]) > 1:
+                self._element = "Multi"
+                self._elements = data["elements"]
+
+            # fix db typos
+            if self._serial == "12-052":
+                self._rarity = "H"
+            elif self._serial == "12-049":
+                self._rarity = "H"
 
             self._description = "\n\n".join(data["abilities"])
             self._iurl = FACEURL.format(self.get_id()) # official url
