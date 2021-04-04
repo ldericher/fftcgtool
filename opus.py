@@ -47,10 +47,12 @@ class imageLoader(threading.Thread):
 
 class Opus:
     def __init__(self, data):
+        logger = logging.getLogger(__name__)
         self._cards = []
 
         for card_data in data:
             card = Card(card_data)
+            logger.info("Imported card {}".format(card))
             self._cards.append(card)
 
         # sort every element alphabetically

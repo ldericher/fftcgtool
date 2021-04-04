@@ -27,7 +27,7 @@ class Card:
             self._serial = data["serial_number"]
             self._name = data["name"]
             self._rarity = data["rarity"][0]
-            self._element = data["element"]
+            self._element = data["elements"][0]
 
             # handle multi element cards
             if len(data["elements"]) > 1:

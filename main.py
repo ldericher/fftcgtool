@@ -36,7 +36,6 @@ def main():
 
     # Setup logging
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(threadName)s %(message)s')
-    logger = logging.getLogger(__name__)
 
     # Fetch and parse card database from ffdecks API
     ffdecks_raw = requests.get(FURL)
@@ -72,7 +71,8 @@ def main():
         ["Ice"],
         ["Wind"],
         ["Earth"],
-        ["Light", "Dark"]
+        ["Light", "Dark"],
+        ["Multi"]
     ]
     for i, elements in enumerate(elementaldecks):
         json_filename = "opus_{}_{}.json".format(args.opusid, "_".join(elements))
