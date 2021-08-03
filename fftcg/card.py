@@ -3,26 +3,35 @@ import re
 
 class Card:
     def __init__(self, data):
-        code_match = re.match(r'([0-9]+)-([0-9]+)([CRHLSB])', data["Code"])
-        if code_match:
-            self.__opus, self.__serial, self.__rarity = code_match.groups()
+        if not data:
+            self.__opus = "0"
+            self.__serial = "000"
+            self.__rarity = "X"
+            self.__element = None
+            self.__description = None
 
         else:
-            code_match = re.match(r'PR-([0-9]+)', data["Code"])
-            if code_match:
-                self.__opus = "PR"
-                self.__serial = code_match.group(1)
-                self.__rarity = "P"
+            if str(data["Code"])[0].isnumeric():
+                self.__opus, self.__serial, self.__rarity = \
+                    re.match(r'([0-9]+)-([0-9]+)([CRHLS])', data["Code"]).groups()
+
+            elif str(data["Code"]).startswith("PR"):
+                self.__opus, self.__serial = \
+                    re.match(r'(PR)-([0-9]+)', data["Code"]).groups()
+                self.__rarity = ""
+
+            elif str(data["Code"]).startswith("B"):
+                self.__opus, self.__serial = \
+                    re.match(r'(B)-([0-9]+)', data["Code"]).groups()
+                self.__rarity = ""
 
             else:
-                code_match = re.match(r'B-([0-9]+)', data["Code"])
-                if code_match:
-                    self.__opus = "B"
-                    self.__serial = code_match.group(1)
-                    self.__rarity = "B"
+                self.__opus, self.__serial, self.__rarity = \
+                    "?", "???", "?"
 
-        self.__name = data["Name_EN"]
-        self.__element = data["Element"]
+            self.__name = data["Name_EN"]
+            self.__element = data["Element"].split("/")
+            self.__description = data["Text_EN"]
 
     def __str__(self):
         return f"'{self.__name}' ({self.__element}, {self.get_id()})"

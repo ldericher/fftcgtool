@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import requests
-
 from fftcg.opus import Opus
 
 
@@ -12,15 +10,12 @@ def print_hi(name):
     #  [str] multicard="○"|"", ex_burst="○"|"", code, special="《S》"|""
     #  [int] exactmatch=0|1
     params = {
-        "language": "de",
         "text": "",
         "element": ["fire"],
-        # "set": ["Opus XIV"],
+        "set": ["Opus XIV"],
     }
 
-    opus_json = requests.post(url="https://fftcg.square-enix-games.com/de/get-cards", json=params).json()
-
-    opus = Opus(opus_json["cards"])
+    opus = Opus(params)
     print(opus)
 
 
