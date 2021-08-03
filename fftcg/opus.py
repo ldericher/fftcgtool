@@ -1,15 +1,17 @@
-import requests
+from roman import toRoman
 
-from .card import Card
-
-APIURL = "https://fftcg.square-enix-games.com/de/get-cards"
+from .cards import Cards
 
 
-class Opus:
-    def __init__(self, params):
-        # self.__cards = [Card(card_data) for card_data in data]
-        req = requests.post(APIURL, json=params)
-        self.__cards = [Card(card_data) for card_data in req.json()["cards"]]
+class Opus(Cards):
+    def __init__(self, number):
+        if isinstance(number, int):
+            number = f"Opus {toRoman(number)}"
 
-    def __str__(self):
-        return "\n".join(str(card) for card in self.__cards)
+        params = {
+            "text": "",
+            "element": ["fire"],
+            "set": [number],
+        }
+
+        Cards.__init__(self, params)
