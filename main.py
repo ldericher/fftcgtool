@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests
 
 from fftcg.opus import Opus

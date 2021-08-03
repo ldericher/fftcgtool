@@ -1,10 +1,9 @@
-out
-__pycache__
-.git
+out/
+**/__pycache__/
+.git/
+.idea/
 
-.gitignore
-.dockerignore
+/.gitignore
+/.dockerignore
 
-Dockerfile
-README.md
-ffdecks.json
+/Dockerfile

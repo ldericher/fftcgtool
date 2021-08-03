@@ -1,21 +1,26 @@
-FROM python:3.7-alpine
+FROM python:3.6-alpine
 
-ENV LIBRARY_PATH=/lib:/usr/lib
 ENV PYTHONUNBUFFERED 1
-
-RUN \
-    # install build prerequisites \
-    apk add --no-cache \
-      build-base \
-      jpeg-dev \
-      zlib-dev \
-&&  pip3 install pillow requests \
-	  # remove build prerequisites \
-&&  apk del --no-cache \
-		  build-base
 
 WORKDIR "/app"
 
+RUN set -ex; \
+    pip3 install pipenv;
+
+COPY Pipfile Pipfile.lock ./
+
+RUN set -ex; \
+    \
+    # install build prerequisites
+    apk add -t build_reqs --no-cache \
+      build-base \
+      jpeg-dev \
+      zlib-dev \
+    ; \
+    pipenv sync; \
+    # remove build prerequisites
+    apk del --no-cache build_reqs;
+
 COPY . .
 
-ENTRYPOINT ["./main.py"]
+ENTRYPOINT ["pipenv", "run", "./main.py"]
