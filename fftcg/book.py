@@ -19,7 +19,6 @@ class Book:
         logger = logging.getLogger(__name__)
 
         images = ImageLoader.load(cards, resolution, language, num_threads)
-        images = [images[card] for card in cards]
 
         # shorthands
         # rows and columns per sheet
@@ -34,7 +33,7 @@ class Book:
 
             for i, image in enumerate(images):
                 x, y = (i % c) * w, (i // c) * h
-                page.paste(image, (x, y, x + w, y + h))
+                page.paste(image, (x, y))
 
             self.__pages.append(page)
 

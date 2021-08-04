@@ -35,6 +35,8 @@ class ImageLoader(threading.Thread):
                 try:
                     res = requests.get(ImageLoader.__FACE_URL.format(card.code, self.__language))
                     image = Image.open(io.BytesIO(res.content))
+
+                    # unify images
                     image.convert("RGB")
                     image = image.resize(self.__resolution, Image.BICUBIC)
                     break
@@ -64,6 +66,9 @@ class ImageLoader(threading.Thread):
         images = {}
         for loader in loaders:
             images = {**images, **loader.images}
+
+        # sort images to match the initial "cards" list
+        images = [images[card] for card in cards]
 
         return images
 
