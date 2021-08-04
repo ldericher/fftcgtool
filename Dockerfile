@@ -5,21 +5,27 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR "/app"
 
 RUN set -ex; \
-    pip3 install pipenv;
+    pip3 install \
+        --no-cache-dir --no-color --disable-pip-version-check --no-python-version-warning \
+        pipenv \
+    ;
 
 COPY Pipfile Pipfile.lock ./
 
 RUN set -ex; \
-    \
-    # install build prerequisites
+    # install prerequisites
     apk add --no-cache \
-      build-base \
-      jpeg-dev \
-      zlib-dev \
+        g++ \
+        jpeg-dev \
+        zlib-dev \
     ; \
-    pipenv sync; \
-    # remove build prerequisites
-    apk del --no-cache build-base;
+    # build/install local packages
+    pipenv install --deploy; \
+    pipenv --clear; \
+    # remove build-only prerequisites
+    apk del --no-cache \
+        g++ \
+    ;
 
 COPY . .
 
