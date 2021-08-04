@@ -11,24 +11,29 @@ class Opus(Cards):
 
         if isinstance(opus_id, str) and opus_id.isnumeric():
             roman_opus_id = roman.toRoman(int(opus_id))
-            api_set = f"Opus {roman_opus_id.upper()}"
+            params_add = {"set": [f"Opus {roman_opus_id.upper()}"]}
             self.__number = str(opus_id)
             self.__name = f"opus_{opus_id}"
 
         elif opus_id == "chaos":
-            api_set = "Boss Deck Chaos"
+            params_add = {"set": ["Boss Deck Chaos"]}
             self.__number = "B"
             self.__name = "boss_deck_chaos"
 
+        elif opus_id == "promo":
+            params_add = {"rarity": ["pr"]}
+            self.__number = "PR"
+            self.__name = "promo"
+
         else:
-            api_set = "?"
+            params_add = {"set": ["?"]}
             self.__number = "?"
             self.__name = "?"
 
         params = {
             "text": "",
-            "element": ["darkness"],
-            "set": [api_set],
+            # "element": ["darkness"],
+            **params_add
         }
 
         Cards.__init__(self, params)
@@ -38,10 +43,9 @@ class Opus(Cards):
             if not card.code.startswith(self.__number + "-"):
                 self.remove(card)
 
-        # sort every element alphabetically
-        self.sort(key=lambda x: x.code)
-        self.sort(key=lambda x: x.name)
-        self.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
+        # sort cards by opus, then serial
+        self.sort(key=lambda x: x.serial)
+        self.sort(key=lambda x: x.opus)
 
         for card in self:
             logger.info(f"imported card {card}")

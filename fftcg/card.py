@@ -57,6 +57,18 @@ class Card:
         return f"{self.__opus}-{self.__serial}{self.__rarity}"
 
     @property
+    def opus(self):
+        return self.__opus
+
+    @property
+    def serial(self):
+        return int(self.__serial)
+
+    @property
+    def rarity(self):
+        return self.__rarity
+
+    @property
     def name(self):
         return self.__name
 
