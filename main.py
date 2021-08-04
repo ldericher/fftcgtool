@@ -3,18 +3,22 @@ import argparse
 import logging
 import os
 
-from fftcg.opus import Opus
 from fftcg.book import Book
+from fftcg.opus import Opus
+
+# constants
+GRID = 7, 10  # default in TTsim: 7 rows, 10 columns
+RESOLUTION = 429, 600  # default in TTsim: 480x670 pixels per card
 
 
 def main():
-    # Setup CLI
+    # set up CLI
     parser = argparse.ArgumentParser(
         description='Imports FFTCG cards for TT-Sim.')
 
     parser.add_argument(
-        'opusid',
-        default="2",
+        'opus_id',
+        default="1",
         metavar="OpusID",
         nargs="?",
         help='the Opus to import')
@@ -28,18 +32,22 @@ def main():
 
     args = parser.parse_args()
 
-    # Setup logging
+    # set up logging
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(threadName)s %(message)s')
-
-    opus = Opus(args.opusid)
 
     # output directory
     if not os.path.exists("out"):
         os.mkdir("out")
     os.chdir("out")
 
-    book = Book(opus, (7, 10), (429, 600), "eg", 16)
-    book.save(f"opus_{args.opusid}_{{}}.jpg")
+    # main program
+    opus = Opus(args.opus_id)
+    book = Book(opus, GRID, RESOLUTION, "eg", 16)
+    book.save(f"{opus.name}_{{}}.jpg")
+
+    # bye
+    logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
+    logging.info("Thanks for using fftcgtool!")
 
 
 if __name__ == '__main__':

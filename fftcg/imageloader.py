@@ -8,16 +8,10 @@ from PIL import Image
 
 
 class ImageLoader(threading.Thread):
-    # Card faces by Square API
-    __FACE_URL = "https://fftcg.cdn.sewest.net/images/cards/full/{}_{}.jpg"
-
-    # Card back image by Aurik
-    __BACK_URL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
-
-    def __init__(self, card_queue, resolution, language):
+    def __init__(self, url_queue, resolution, language):
         threading.Thread.__init__(self)
 
-        self.__queue = card_queue
+        self.__queue = url_queue
         self.__resolution = resolution
         self.__language = language
         self.__images = {}
@@ -26,14 +20,14 @@ class ImageLoader(threading.Thread):
         logger = logging.getLogger(__name__)
 
         while not self.__queue.empty():
-            # take next card
-            card = self.__queue.get()
+            # take next url
+            url = self.__queue.get()
 
-            # fetch card image (retry on fail)
+            # fetch image (retry on fail)
             while True:
-                logger.info(f"get image for card {card}")
+                logger.info(f"downloading image {url}")
                 try:
-                    res = requests.get(ImageLoader.__FACE_URL.format(card.code, self.__language))
+                    res = requests.get(url)
                     image = Image.open(io.BytesIO(res.content))
 
                     # unify images
@@ -44,31 +38,32 @@ class ImageLoader(threading.Thread):
                     pass
 
             # put image in correct position
-            self.__images[card] = image
+            self.__images[url] = image
 
             # image is processed
             self.__queue.task_done()
 
     @classmethod
-    def load(cls, cards, resolution, language, num_threads):
-        card_queue = queue.Queue()
-        for card in cards:
-            card_queue.put(card)
+    def load(cls, urls, resolution, language, num_threads):
+        url_queue = queue.Queue()
+        for url in urls:
+            url_queue.put(url)
 
         loaders = []
         for _ in range(num_threads):
-            loader = cls(card_queue, resolution, language)
+            loader = cls(url_queue, resolution, language)
             loaders.append(loader)
             loader.start()
 
-        card_queue.join()
+        url_queue.join()
 
+        # stitch all "images" dicts together
         images = {}
         for loader in loaders:
             images = {**images, **loader.images}
 
         # sort images to match the initial "cards" list
-        images = [images[card] for card in cards]
+        images = [images[url] for url in urls]
 
         return images
 

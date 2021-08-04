@@ -6,33 +6,37 @@ from .cards import Cards
 
 
 class Opus(Cards):
-    def __init__(self, number):
+    def __init__(self, opus_id):
         logger = logging.getLogger(__name__)
 
-        if isinstance(number, str) and number.isnumeric():
-            set_name = f"Opus {roman.toRoman(int(number))}"
-            number = str(number)
+        if isinstance(opus_id, str) and opus_id.isnumeric():
+            roman_opus_id = roman.toRoman(int(opus_id))
+            api_set = f"Opus {roman_opus_id.upper()}"
+            self.__number = str(opus_id)
+            self.__name = f"opus_{opus_id}"
 
-        elif number == "Boss Deck Chaos":
-            set_name = number
-            number = "B"
+        elif opus_id == "chaos":
+            api_set = "Boss Deck Chaos"
+            self.__number = "B"
+            self.__name = "boss_deck_chaos"
 
         else:
-            set_name = "?"
-            number = "?"
+            api_set = "?"
+            self.__number = "?"
+            self.__name = "?"
 
         params = {
             "text": "",
-            # "element": ["fire"],
-            "set": [set_name],
+            "element": ["darkness"],
+            "set": [api_set],
         }
 
         Cards.__init__(self, params)
 
-        # filter out reprints
-        reprints = [card for card in self if not card.code.startswith(number)]
-        for reprint in reprints:
-            self.remove(reprint)
+        # remove reprints
+        for card in self:
+            if not card.code.startswith(self.__number + "-"):
+                self.remove(card)
 
         # sort every element alphabetically
         self.sort(key=lambda x: x.code)
@@ -41,3 +45,11 @@ class Opus(Cards):
 
         for card in self:
             logger.info(f"imported card {card}")
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def number(self):
+        return self.__number
