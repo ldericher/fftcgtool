@@ -1,10 +1,10 @@
 import io
 import logging
-import threading
 import queue
+import threading
 
-from PIL import Image
 import requests
+from PIL import Image
 
 
 class ImageLoader(threading.Thread):

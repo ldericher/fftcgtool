@@ -1,7 +1,5 @@
 import queue
 
-from .imageloader import ImageLoader
-
 
 class Book:
     def __init__(self, cards):
@@ -10,7 +8,7 @@ class Book:
     def __get_pages(self, grid):
         # cards per sheet
         r, c = grid
-        capacity = r*c - 1
+        capacity = r * c - 1
         # flat copy
         cards = self.__cards
 

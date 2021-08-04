@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from fftcg.opus import Opus
 from fftcg.imageloader import ImageLoader
+from fftcg.opus import Opus
 
 
 def main():
