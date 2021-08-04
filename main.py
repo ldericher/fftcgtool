@@ -19,7 +19,7 @@ def main():
     parser.add_argument(
         'opus_id',
         default="1",
-        metavar="OpusID",
+        metavar="Opus_ID",
         nargs="?",
         help='the Opus to import')
 
@@ -42,7 +42,7 @@ def main():
 
     # main program
     opus = Opus(args.opus_id)
-    book = Book(opus, GRID, RESOLUTION, "eg", 16)
+    book = Book(opus, GRID, RESOLUTION, "eg", args.num_threads)
     book.save(f"{opus.name}_{{}}.jpg")
 
     # bye
