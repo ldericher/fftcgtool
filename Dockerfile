@@ -12,14 +12,14 @@ COPY Pipfile Pipfile.lock ./
 RUN set -ex; \
     \
     # install build prerequisites
-    apk add -t build_reqs --no-cache \
+    apk add --no-cache \
       build-base \
       jpeg-dev \
       zlib-dev \
     ; \
     pipenv sync; \
     # remove build prerequisites
-    apk del --no-cache build_reqs;
+    apk del --no-cache build-base;
 
 COPY . .
 
