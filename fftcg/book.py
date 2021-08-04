@@ -1,25 +1,43 @@
-import queue
+import logging
+
+from PIL import Image
+
+from .imageloader import ImageLoader
+
+
+def chunks(whole: list, chunk_size):
+    # while there are elements
+    while whole:
+        # get a chunk
+        yield whole[:chunk_size]
+        # remove that chunk
+        whole = whole[chunk_size:]
 
 
 class Book:
-    def __init__(self, cards):
-        self.__cards = cards
+    def __init__(self, cards, grid, resolution, language, num_threads):
+        logger = logging.getLogger(__name__)
 
-    def __get_pages(self, grid):
-        # cards per sheet
+        images = ImageLoader.load(cards, resolution, language, num_threads)
+        images = [images[card] for card in cards]
+
+        # shorthands
+        # rows and columns per sheet
         r, c = grid
-        capacity = r * c - 1
-        # flat copy
-        cards = self.__cards
+        # width, height per card
+        w, h = resolution
 
-        # while there are cards
-        while cards:
-            # get a chunk
-            yield cards[:capacity]
-            # remove that chunk
-            cards = cards[capacity:]
+        self.__pages = []
+        for images in chunks(images, r * c - 1):
+            page = Image.new("RGB", (c * w, r * h))
+            logger.info(f"New image: {page.size[0]}x{page.size[1]}")
 
-    def populate(self, grid, resolution, threadnum=16):
-        card_queue = queue.Queue()
-        for i, card in enumerate(self.__cards):
-            card_queue.put((i, card))
+            for i, image in enumerate(images):
+                x, y = (i % c) * w, (i // c) * h
+                page.paste(image, (x, y, x + w, y + h))
+
+            self.__pages.append(page)
+
+    def save(self, filename):
+        for i, page in enumerate(self.__pages):
+            page.save(filename.format(i))

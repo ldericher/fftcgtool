@@ -24,15 +24,16 @@ class ImageLoader(threading.Thread):
 
     def run(self) -> None:
         logger = logging.getLogger(__name__)
+
         while not self.__queue.empty():
             # take next card
-            i, card = self.__queue.get()
+            card = self.__queue.get()
 
             # fetch card image (retry on fail)
             while True:
-                logger.info("get image for card {}".format(card))
+                logger.info(f"get image for card {card}")
                 try:
-                    res = requests.get(ImageLoader.__FACE_URL.format(card.get_code(), self.__language))
+                    res = requests.get(ImageLoader.__FACE_URL.format(card.code, self.__language))
                     image = Image.open(io.BytesIO(res.content))
                     image.convert("RGB")
                     image = image.resize(self.__resolution, Image.BICUBIC)
@@ -41,21 +42,31 @@ class ImageLoader(threading.Thread):
                     pass
 
             # put image in correct position
-            self.__images[i] = image
+            self.__images[card] = image
 
             # image is processed
             self.__queue.task_done()
 
     @classmethod
-    def spawn(cls, cards, resolution, language="eg", num_threads=16):
+    def load(cls, cards, resolution, language, num_threads):
         card_queue = queue.Queue()
-        for i, card in enumerate(cards):
-            card_queue.put((i, card))
+        for card in cards:
+            card_queue.put(card)
 
+        loaders = []
         for _ in range(num_threads):
-            cls(card_queue, resolution, language).start()
+            loader = cls(card_queue, resolution, language)
+            loaders.append(loader)
+            loader.start()
 
-        return card_queue
+        card_queue.join()
 
-    def get_images(self):
+        images = {}
+        for loader in loaders:
+            images = {**images, **loader.images}
+
+        return images
+
+    @property
+    def images(self):
         return self.__images

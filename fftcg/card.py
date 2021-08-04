@@ -49,17 +49,21 @@ class Card:
             self.__text = data[f"Text_{language}"]
 
     def __str__(self):
-        return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.get_code()})"
+        return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.code})"
 
     # 6-048C
-    def get_code(self):
+    @property
+    def code(self):
         return f"{self.__opus}-{self.__serial}{self.__rarity}"
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
-    def get_text(self):
+    @property
+    def text(self):
         return self.__text
 
-    def get_elements(self):
+    @property
+    def elements(self):
         return self.__elements
