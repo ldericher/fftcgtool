@@ -2,19 +2,26 @@ import requests
 
 from .card import Card
 
-APIURL = "https://fftcg.square-enix-games.com/de/get-cards"
 
+class Cards(list):
+    __API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
-class Cards:
     def __init__(self, params):
-        # supported params:
-        #  [str] text (required)
-        #  [array] type, element, cost, rarity, power, category_1, set
-        #  [str] language, code, multicard="○"|"", ex_burst="○"|"", special="《S》"|""
-        #  [int] exactmatch=0|1
+        list.__init__(self)
 
-        req = requests.post(APIURL, json=params)
-        self.__content = [Card(card_data) for card_data in req.json()["cards"]]
+        if isinstance(params, dict):
+            # required params:
+            #  text
+            # supported params:
+            #  [str] text, language, code, multicard="○"|"", ex_burst="○"|"", special="《S》"|""
+            #  [array] type, element, cost, rarity, power, category_1, set
+            #  [int] exactmatch=0|1
+
+            req = requests.post(Cards.__API_URL, json=params)
+            self.extend([Card(card_data) for card_data in req.json()["cards"]])
+
+        elif isinstance(params, list):
+            self.extend(params)
 
     def __str__(self):
-        return "\n".join(str(card) for card in self.__content)
+        return "\n".join(str(card) for card in self)
