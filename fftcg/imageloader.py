@@ -8,7 +8,7 @@ from PIL import Image
 
 
 class ImageLoader(threading.Thread):
-    def __init__(self, url_queue, resolution, language):
+    def __init__(self, url_queue: queue.Queue, resolution: tuple, language: str):
         threading.Thread.__init__(self)
 
         self.__queue = url_queue
@@ -44,7 +44,7 @@ class ImageLoader(threading.Thread):
             self.__queue.task_done()
 
     @classmethod
-    def load(cls, urls, resolution, language, num_threads):
+    def load(cls, urls: list, resolution: tuple, language: str, num_threads: int):
         url_queue = queue.Queue()
         for url in urls:
             url_queue.put(url)

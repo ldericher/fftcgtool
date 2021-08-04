@@ -6,13 +6,13 @@ from .cards import Cards
 
 
 class Opus(Cards):
-    def __init__(self, opus_id):
+    def __init__(self, opus_id: str):
         logger = logging.getLogger(__name__)
 
-        if isinstance(opus_id, str) and opus_id.isnumeric():
+        if opus_id.isnumeric():
             roman_opus_id = roman.toRoman(int(opus_id))
             params_add = {"set": [f"Opus {roman_opus_id.upper()}"]}
-            self.__number = str(opus_id)
+            self.__number = opus_id
             self.__name = f"opus_{opus_id}"
 
         elif opus_id == "chaos":

@@ -13,7 +13,7 @@ class Card:
         '闇': "Darkness"
     }
 
-    def __init__(self, data, language="EN"):
+    def __init__(self, data: dict, language: str = "EN"):
         if not data:
             self.__opus = "0"
             self.__serial = "000"
