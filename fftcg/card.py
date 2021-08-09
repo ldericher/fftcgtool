@@ -3,14 +3,14 @@ import re
 
 class Card:
     __ELEMENTS_MAP = {
-        '火': "Fire",
-        '氷': "Ice",
-        '風': "Wind",
-        '土': "Earth",
-        '雷': "Lightning",
-        '水': "Water",
-        '光': "Light",
-        '闇': "Darkness"
+        "火": "Fire",
+        "氷": "Ice",
+        "風": "Wind",
+        "土": "Earth",
+        "雷": "Lightning",
+        "水": "Water",
+        "光": "Light",
+        "闇": "Darkness"
     }
 
     def __init__(self, data: dict[str, any], language: str = "EN"):
@@ -25,18 +25,18 @@ class Card:
             if str(data["Code"])[0].isnumeric():
                 # card code starts with a number
                 self.__opus, self.__serial, self.__rarity = \
-                    re.match(r'([0-9]+)-([0-9]+)([CRHLS])', data["Code"]).groups()
+                    re.match(r"([0-9]+)-([0-9]+)([CRHLS])", data["Code"]).groups()
 
             elif str(data["Code"]).startswith("PR"):
                 # card code starts with "PR"
                 self.__opus, self.__serial = \
-                    re.match(r'(PR)-([0-9]+)', data["Code"]).groups()
+                    re.match(r"(PR)-([0-9]+)", data["Code"]).groups()
                 self.__rarity = ""
 
             elif str(data["Code"]).startswith("B"):
                 # card code starts with "B"
                 self.__opus, self.__serial = \
-                    re.match(r'(B)-([0-9]+)', data["Code"]).groups()
+                    re.match(r"(B)-([0-9]+)", data["Code"]).groups()
                 self.__rarity = ""
 
             else:

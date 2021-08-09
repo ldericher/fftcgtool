@@ -14,26 +14,29 @@ RESOLUTION = 429, 600  # default in TTsim: 480x670 pixels per card
 def main() -> None:
     # set up CLI
     parser = argparse.ArgumentParser(
-        description='Imports FFTCG cards for TT-Sim.')
+        description="Imports FFTCG cards for TT-Sim.",
+    )
 
     parser.add_argument(
-        'opus_id',
-        default="1",
+        "opus_id",
+        default="promo",
         metavar="Opus_ID",
         nargs="?",
-        help='the Opus to import')
+        help="the Opus to import",
+    )
 
     parser.add_argument(
-        '-n', '--num_threads',
+        "-n", "--num_threads",
         type=int,
         default=20,
         metavar="COUNT",
-        help='maximum number of concurrent requests')
+        help="maximum number of concurrent requests",
+    )
 
     args = parser.parse_args()
 
     # set up logging
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(threadName)s %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(threadName)s %(message)s")
 
     # output directory
     if not os.path.exists("out"):
@@ -50,5 +53,5 @@ def main() -> None:
     logging.info("Thanks for using fftcgtool!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
