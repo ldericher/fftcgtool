@@ -2,7 +2,7 @@ import logging
 
 import roman
 
-from cards import Cards
+from .cards import Cards
 
 
 class Opus(Cards):

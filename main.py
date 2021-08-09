@@ -3,7 +3,7 @@ import argparse
 import logging
 import os
 
-from fftcg import Book, Opus
+import fftcg
 
 # constants
 GRID = 7, 10  # default in TTsim: 7 rows, 10 columns
@@ -43,8 +43,8 @@ def main() -> None:
     os.chdir("out")
 
     # main program
-    opus = Opus(args.opus_id)
-    book = Book(opus, GRID, RESOLUTION, "eg", args.num_threads)
+    opus = fftcg.Opus(args.opus_id)
+    book = fftcg.Book(opus, GRID, RESOLUTION, "eg", args.num_threads)
     book.save(f"{opus.name}_{{}}.jpg")
 
     # bye
