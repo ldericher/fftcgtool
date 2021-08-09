@@ -9,7 +9,7 @@ from PIL import Image
 
 class ImageLoader(threading.Thread):
     def __init__(self, url_queue: queue.Queue, resolution: tuple[int, int], language: str):
-        threading.Thread.__init__(self)
+        super().__init__()
 
         self.__queue = url_queue
         self.__resolution = resolution

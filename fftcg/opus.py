@@ -30,7 +30,7 @@ class Opus(Cards):
             self.__number = "?"
             self.__name = "?"
 
-        Cards.__init__(self, params)
+        super().__init__(params)
 
         # remove reprints
         for card in self:

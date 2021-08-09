@@ -7,8 +7,6 @@ class Cards(list[Card]):
     __API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
     def __init__(self, params: dict[str, any]):
-        list.__init__(self)
-
         # required params:
         #  text
         # supported params:
@@ -20,7 +18,7 @@ class Cards(list[Card]):
             params["text"] = ""
 
         req = requests.post(Cards.__API_URL, json=params)
-        self.extend([Card(card_data) for card_data in req.json()["cards"]])
+        super().__init__([Card(card_data) for card_data in req.json()["cards"]])
 
     def __str__(self) -> str:
         return "\n".join(str(card) for card in self)
