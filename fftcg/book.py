@@ -1,5 +1,4 @@
 import logging
-from typing import List, Tuple, Any
 
 from PIL import Image
 
@@ -7,7 +6,7 @@ from .cards import Cards
 from .imageloader import ImageLoader
 
 
-def chunks(whole: List[Any], chunk_size) -> List:
+def chunks(whole: list[any], chunk_size) -> list:
     # while there are elements
     while whole:
         # get a chunk
@@ -23,7 +22,7 @@ class Book:
     # Card back image by Aurik
     __BACK_URL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
 
-    def __init__(self, cards: Cards, grid: Tuple[int, int], resolution: Tuple[int, int], language: str,
+    def __init__(self, cards: Cards, grid: tuple[int, int], resolution: tuple[int, int], language: str,
                  num_threads: int):
         logger = logging.getLogger(__name__)
 

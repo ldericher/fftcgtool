@@ -1,7 +1,5 @@
 import re
 
-from typing import List, Dict, Any
-
 
 class Card:
     __ELEMENTS_MAP = {
@@ -15,7 +13,7 @@ class Card:
         '闇': "Darkness"
     }
 
-    def __init__(self, data: Dict[str, Any], language: str = "EN"):
+    def __init__(self, data: dict[str, any], language: str = "EN"):
         if not data:
             self.__opus = "0"
             self.__serial = "000"
@@ -79,5 +77,5 @@ class Card:
         return self.__text
 
     @property
-    def elements(self) -> List[str]:
+    def elements(self) -> list[str]:
         return self.__elements

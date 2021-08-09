@@ -1,14 +1,12 @@
-from typing import Dict, Any, List
-
 import requests
 
 from .card import Card
 
 
-class Cards(List[Card]):
+class Cards(list[Card]):
     __API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
-    def __init__(self, params: Dict[str, Any]):
+    def __init__(self, params: dict[str, any]):
         list.__init__(self)
 
         # required params:

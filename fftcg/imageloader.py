@@ -2,14 +2,13 @@ import io
 import logging
 import queue
 import threading
-from typing import List, Tuple, Dict
 
 import requests
 from PIL import Image
 
 
 class ImageLoader(threading.Thread):
-    def __init__(self, url_queue: queue.Queue, resolution: Tuple[int, int], language: str):
+    def __init__(self, url_queue: queue.Queue, resolution: tuple[int, int], language: str):
         threading.Thread.__init__(self)
 
         self.__queue = url_queue
@@ -45,7 +44,7 @@ class ImageLoader(threading.Thread):
             self.__queue.task_done()
 
     @classmethod
-    def load(cls, urls: List[str], resolution: Tuple[int, int], language: str, num_threads: int) -> List[Image.Image]:
+    def load(cls, urls: list[str], resolution: tuple[int, int], language: str, num_threads: int) -> list[Image.Image]:
         url_queue = queue.Queue()
         for url in urls:
             url_queue.put(url)
@@ -61,7 +60,7 @@ class ImageLoader(threading.Thread):
         # stitch all "images" dicts together
         images = {}
         for loader in loaders:
-            images = {**images, **loader.images}
+            images |= loader.images
 
         # sort images to match the initial "urls" list
         images = [images[url] for url in urls]
@@ -69,5 +68,5 @@ class ImageLoader(threading.Thread):
         return images
 
     @property
-    def images(self) -> Dict[str, Image.Image]:
+    def images(self) -> dict[str, Image.Image]:
         return self.__images
