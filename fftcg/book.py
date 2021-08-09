@@ -2,8 +2,8 @@ import logging
 
 from PIL import Image
 
-from .cards import Cards
-from .imageloader import ImageLoader
+from cards import Cards
+from imageloader import ImageLoader
 
 
 def chunks(whole: list[any], chunk_size) -> list:

@@ -3,8 +3,7 @@ import argparse
 import logging
 import os
 
-from fftcg.book import Book
-from fftcg.opus import Opus
+from fftcg import Book, Opus
 
 # constants
 GRID = 7, 10  # default in TTsim: 7 rows, 10 columns
