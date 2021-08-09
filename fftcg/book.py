@@ -48,9 +48,9 @@ class Book:
         # width, height per card
         w, h = resolution
 
-        def paste_image(page: Image, index: int, image: Image) -> None:
+        def paste_card(index: int, card: Image) -> None:
             x, y = (index % c) * w, (index // c) * h
-            page.paste(image, (x, y))
+            page.paste(card, (x, y))
 
         self.__pages = []
         for images in chunks(images, grid_capacity):
@@ -60,10 +60,10 @@ class Book:
 
             # paste card faces onto page
             for i, image in enumerate(images):
-                paste_image(page, i, image)
+                paste_card(i, image)
 
             # paste card back in last position
-            paste_image(page, c * r - 1, back_image)
+            paste_card(c * r - 1, back_image)
 
             self.__pages.append(page)
 

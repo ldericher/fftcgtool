@@ -16,6 +16,9 @@ class Cards(list[Card]):
         #  [array] type, element, cost, rarity, power, category_1, set
         #  [int] exactmatch=0|1
 
+        if "text" not in params:
+            params["text"] = ""
+
         req = requests.post(Cards.__API_URL, json=params)
         self.extend([Card(card_data) for card_data in req.json()["cards"]])
 

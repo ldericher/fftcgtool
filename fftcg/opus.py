@@ -9,29 +9,24 @@ class Opus(Cards):
     def __init__(self, opus_id: str):
         logger = logging.getLogger(__name__)
 
-        params: dict[str, any] = {
-            "text": "",
-            # "element": ["darkness"],
-        }
-
         if opus_id.isnumeric():
             roman_opus_id = roman.toRoman(int(opus_id))
-            params |= {"set": [f"Opus {roman_opus_id.upper()}"]}
+            params = {"set": [f"Opus {roman_opus_id.upper()}"]}
             self.__number = opus_id
             self.__name = f"opus_{opus_id}"
 
         elif opus_id == "chaos":
-            params |= {"set": ["Boss Deck Chaos"]}
+            params = {"set": ["Boss Deck Chaos"]}
             self.__number = "B"
             self.__name = "boss_deck_chaos"
 
         elif opus_id == "promo":
-            params |= {"rarity": ["pr"]}
+            params = {"rarity": ["pr"]}
             self.__number = "PR"
             self.__name = "promo"
 
         else:
-            params |= {"set": ["?"]}
+            params = {"set": ["?"]}
             self.__number = "?"
             self.__name = "?"
 

@@ -34,7 +34,7 @@ class ImageLoader(threading.Thread):
                     image.convert("RGB")
                     image = image.resize(self.__resolution, Image.BICUBIC)
                     break
-                except:
+                except requests.exceptions.RequestException:
                     pass
 
             # put image in correct position
