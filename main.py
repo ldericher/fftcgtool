@@ -11,7 +11,7 @@ GRID = 7, 10  # default in TTsim: 7 rows, 10 columns
 RESOLUTION = 429, 600  # default in TTsim: 480x670 pixels per card
 
 
-def main():
+def main() -> None:
     # set up CLI
     parser = argparse.ArgumentParser(
         description='Imports FFTCG cards for TT-Sim.')

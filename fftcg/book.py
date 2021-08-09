@@ -1,4 +1,5 @@
 import logging
+from typing import List, Tuple, Any
 
 from PIL import Image
 
@@ -6,7 +7,7 @@ from .cards import Cards
 from .imageloader import ImageLoader
 
 
-def chunks(whole: list, chunk_size):
+def chunks(whole: List[Any], chunk_size) -> List:
     # while there are elements
     while whole:
         # get a chunk
@@ -22,7 +23,8 @@ class Book:
     # Card back image by Aurik
     __BACK_URL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
 
-    def __init__(self, cards: Cards, grid: tuple, resolution: tuple, language: str, num_threads: int):
+    def __init__(self, cards: Cards, grid: Tuple[int, int], resolution: Tuple[int, int], language: str,
+                 num_threads: int):
         logger = logging.getLogger(__name__)
 
         # sort cards by element, then alphabetically
@@ -47,7 +49,7 @@ class Book:
         # width, height per card
         w, h = resolution
 
-        def paste_image(page: Image, index: int, image: Image):
+        def paste_image(page: Image, index: int, image: Image) -> None:
             x, y = (index % c) * w, (index // c) * h
             page.paste(image, (x, y))
 
@@ -66,6 +68,6 @@ class Book:
 
             self.__pages.append(page)
 
-    def save(self, filename: str):
+    def save(self, filename: str) -> None:
         for i, page in enumerate(self.__pages):
             page.save(filename.format(i))

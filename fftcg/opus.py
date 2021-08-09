@@ -51,9 +51,9 @@ class Opus(Cards):
             logger.info(f"imported card {card}")
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__name
 
     @property
-    def number(self):
+    def number(self) -> str:
         return self.__number
