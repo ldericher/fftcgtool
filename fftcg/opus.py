@@ -10,25 +10,28 @@ class Opus(Cards):
         logger = logging.getLogger(__name__)
 
         if opus_id.isnumeric():
-            roman_opus_id = roman.toRoman(int(opus_id))
-            params = {"set": [f"Opus {roman_opus_id.upper()}"]}
+            self.__name = f"Opus {roman.toRoman(int(opus_id)).upper()}"
             self.__number = opus_id
-            self.__name = f"opus_{opus_id}"
+            self.__filename = f"opus_{opus_id}"
+            params = {"set": [self.__name]}
 
         elif opus_id == "chaos":
-            params = {"set": ["Boss Deck Chaos"]}
+            self.__name = "Boss Deck Chaos"
             self.__number = "B"
-            self.__name = "boss_deck_chaos"
+            self.__filename = "boss_deck_chaos"
+            params = {"set": [self.__name]}
 
         elif opus_id == "promo":
-            params = {"rarity": ["pr"]}
+            self.__name = "Promo"
             self.__number = "PR"
-            self.__name = "promo"
+            self.__filename = "promo"
+            params = {"rarity": ["pr"]}
 
         else:
-            params = {"set": ["?"]}
-            self.__number = "?"
             self.__name = "?"
+            self.__number = "?"
+            self.__filename = "?"
+            params = {"set": "?"}
 
         super().__init__(params)
 
@@ -51,3 +54,7 @@ class Opus(Cards):
     @property
     def number(self) -> str:
         return self.__number
+
+    @property
+    def filename(self) -> str:
+        return self.__filename

@@ -6,7 +6,7 @@ import os
 import fftcg
 
 # constants
-GRID = 7, 10  # default in TTsim: 7 rows, 10 columns
+GRID = 10, 7  # default in TTsim: 10 columns, 7 rows
 RESOLUTION = 429, 600  # default in TTsim: 480x670 pixels per card
 
 
@@ -45,7 +45,7 @@ def main() -> None:
     # main program
     opus = fftcg.Opus(args.opus_id)
     book = fftcg.Book(opus, GRID, RESOLUTION, "eg", args.num_threads)
-    book.save(f"{opus.name}_{{}}.jpg")
+    book.save(opus.filename)
 
     # bye
     logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
