@@ -18,7 +18,8 @@ class Card:
             self.__opus = "0"
             self.__serial = "000"
             self.__rarity = "X"
-            self.__elements = None
+            self.__elements = []
+            self.__name = None
             self.__text = None
 
         else:

@@ -1,10 +1,12 @@
 from PIL import Image
 
+_Point = tuple[int, int]
 
-class Grid(tuple[int, int]):
-    def __mul__(self, other):
+
+class Grid(_Point):
+    def __mul__(self, other: _Point) -> _Point:
         other = Grid(other)
-        return Grid((self.x * other.x, self.y * other.y))
+        return self.x * other.x, self.y * other.y
 
     @property
     def x(self):
