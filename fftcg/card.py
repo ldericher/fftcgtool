@@ -64,10 +64,10 @@ class Card(yaml.YAMLObject):
 
         else:
             def sub_encircle(match: re.Match):
-                return encircle_symbol(match.group(1), True)
+                return encircle_symbol(match.group(1), False)
 
             def sub_elements(match: re.Match):
-                return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], True)
+                return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], False)
 
             # load text
             text = str(data[f"Text_{language}"])
