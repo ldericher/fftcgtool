@@ -75,7 +75,7 @@ def main() -> None:
         ]
 
         # add in the opus_filter for all elemental decks
-        filters = list(zip([opus_filter]*len(element_filters), element_filters))
+        filters = list(zip([opus_filter] * len(element_filters), element_filters))
 
     # make the decks
     for f in filters:

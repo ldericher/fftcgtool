@@ -4,7 +4,6 @@ import yaml
 from PIL import Image
 
 from .cards import Cards
-from .code import Code
 from .grid import Grid
 from .imageloader import ImageLoader
 
