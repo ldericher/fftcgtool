@@ -60,7 +60,7 @@ class Book:
         # load pages.yml file
         try:
             with open("pages.yml", "r") as file:
-                pages = yaml.load(file)
+                pages = yaml.load(file, Loader=yaml.Loader)
         except FileNotFoundError:
             pages = {}
 
@@ -71,8 +71,8 @@ class Book:
             page["image"].save(fn)
             # add contents of image
             pages[fn] = {}
-            pages[fn]["cards"] = page["cards"]  # [card.code for card in page["cards"]]
+            pages[fn]["cards"] = page["cards"]
 
         # update pages.yml file
         with open("pages.yml", "w") as file:
-            yaml.dump(pages, file)
+            yaml.dump(pages, file, Dumper=yaml.Dumper)
