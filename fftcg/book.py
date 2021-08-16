@@ -1,5 +1,6 @@
 import logging
 
+import yaml
 from PIL import Image
 
 from .cards import Cards
@@ -54,5 +55,24 @@ class Book:
         return self.__pages[index]["image"]
 
     def save(self, filename: str) -> None:
+        pages: dict[str, dict[str, any]]
+
+        # load pages.yml file
+        try:
+            with open("pages.yml", "r") as file:
+                pages = yaml.load(file)
+        except FileNotFoundError:
+            pages = {}
+
+        # save book
         for i, page in enumerate(self.__pages):
-            page["image"].save(f"{filename}_{i}.jpg")
+            fn = f"{filename}_{i}.jpg"
+            # save page image
+            page["image"].save(fn)
+            # add contents of image
+            pages[fn] = {}
+            pages[fn]["cards"] = page["cards"]  # [card.code for card in page["cards"]]
+
+        # update pages.yml file
+        with open("pages.yml", "w") as file:
+            yaml.dump(pages, file)

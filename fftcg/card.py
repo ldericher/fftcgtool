@@ -1,7 +1,12 @@
+import json
 import re
 
+import yaml
 
-class Card:
+
+class Card(yaml.YAMLObject):
+    yaml_tag = u'!Card'
+
     __ELEMENTS_MAP = {
         "火": "Fire",
         "氷": "Ice",
@@ -13,44 +18,63 @@ class Card:
         "闇": "Darkness"
     }
 
-    def __init__(self, data: dict[str, any], language: str = "EN"):
+    def __init__(self, opus, serial, rarity, elements, name, text):
+        self.__opus = opus
+        self.__serial = serial
+        self.__rarity = rarity
+        self.__elements = elements
+        self.__name = name
+        self.__text = text
+
+    @classmethod
+    def from_data(cls, data: dict[str, any], language: str):
         if not data:
-            self.__opus = "0"
-            self.__serial = "000"
-            self.__rarity = "X"
-            self.__elements = []
-            self.__name = None
-            self.__text = None
+            return cls(
+                opus="0",
+                serial="000",
+                rarity="X",
+                elements=[],
+                name=None,
+                text=None,
+            )
 
         else:
             if str(data["Code"])[0].isnumeric():
                 # card code starts with a number
-                self.__opus, self.__serial, self.__rarity = \
+                opus, serial, rarity = \
                     re.match(r"([0-9]+)-([0-9]+)([CRHLS])", data["Code"]).groups()
 
             elif str(data["Code"]).startswith("PR"):
                 # card code starts with "PR"
-                self.__opus, self.__serial = \
+                opus, serial = \
                     re.match(r"(PR)-([0-9]+)", data["Code"]).groups()
-                self.__rarity = ""
+                rarity = ""
 
             elif str(data["Code"]).startswith("B"):
                 # card code starts with "B"
-                self.__opus, self.__serial = \
+                opus, serial = \
                     re.match(r"(B)-([0-9]+)", data["Code"]).groups()
-                self.__rarity = ""
+                rarity = ""
 
             else:
                 # card code not recognized
-                self.__opus, self.__serial, self.__rarity = \
+                opus, serial, rarity = \
                     "?", "???", "?"
 
-            self.__elements = [Card.__ELEMENTS_MAP[element] for element in data["Element"].split("/")]
-            self.__name = data[f"Name_{language}"]
-            self.__text = data[f"Text_{language}"]
+            return cls(
+                opus=opus,
+                serial=serial,
+                rarity=rarity,
+                elements=[Card.__ELEMENTS_MAP[element] for element in data["Element"].split("/")],
+                name=data[f"Name_{language}"],
+                text=data[f"Text_{language}"],
+            )
 
     def __str__(self) -> str:
         return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.code})"
+
+    def to_json(self) -> str:
+        return json.dumps(self, default=lambda o: o.__dict__)
 
     # 6-048C
     @property

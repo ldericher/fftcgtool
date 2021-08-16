@@ -18,7 +18,7 @@ class Cards(list[Card]):
             params["text"] = ""
 
         req = requests.post(Cards.__API_URL, json=params)
-        super().__init__([Card(card_data) for card_data in req.json()["cards"]])
+        super().__init__([Card.from_data(card_data, "EN") for card_data in req.json()["cards"]])
 
     def __str__(self) -> str:
         return "\n".join(str(card) for card in self)
