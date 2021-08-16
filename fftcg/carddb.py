@@ -1,7 +1,5 @@
 import yaml
 
-from .ttsdeck import TTSDeck
-
 _DictOfDicts = dict[str, dict[str, any]]
 
 
@@ -43,4 +41,5 @@ class CardDB(_DictOfDicts):
             if all([f(content["card"]) for f in filters])
         ]
 
+        from .ttsdeck import TTSDeck
         return TTSDeck(codes, self)

@@ -59,7 +59,6 @@ def main() -> None:
         filters = [[opus_filter]]
 
     else:
-
         def element_filter(element: str):
             return lambda card: card.elements == [element]
 
