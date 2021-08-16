@@ -54,22 +54,28 @@ def main() -> None:
     def opus_filter(card: fftcg.Card):
         return card.code.opus == opus.number
 
-    def element_filter(element: str):
-        return lambda card: card.elements == [element]
+    filters: list
+    if opus.number == "PR":
+        filters = [[opus_filter]]
 
-    # simple cases: create lambdas for base elemental decks
-    base_elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"]
-    element_filters = [element_filter(elem) for elem in base_elements]
+    else:
 
-    element_filters += [
-        # light/darkness elemental deck
-        lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
-        # multi element deck
-        lambda card: len(card.elements) > 1,
-    ]
+        def element_filter(element: str):
+            return lambda card: card.elements == [element]
 
-    # add in the opus_filter for all elemental decks
-    filters = list(zip([opus_filter]*len(element_filters), element_filters))
+        # simple cases: create lambdas for base elemental decks
+        base_elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"]
+        element_filters = [element_filter(elem) for elem in base_elements]
+
+        element_filters += [
+            # light/darkness elemental deck
+            lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
+            # multi element deck
+            lambda card: len(card.elements) > 1,
+        ]
+
+        # add in the opus_filter for all elemental decks
+        filters = list(zip([opus_filter]*len(element_filters), element_filters))
 
     # make the decks
     for f in filters:
