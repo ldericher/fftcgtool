@@ -55,40 +55,24 @@ class Book:
     def __getitem__(self, index: int) -> Image.Image:
         return self.__pages[index]["image"]
 
-    def save(self, filename: str) -> None:
+    def save(self, file_name: str, book_yml_name: str) -> None:
         book: dict[str, dict[str, any]]
 
         # load book.yml file
         try:
-            with open("book.yml", "r") as file:
+            with open(book_yml_name, "r") as file:
                 book = yaml.load(file, Loader=yaml.Loader)
         except FileNotFoundError:
             book = {}
 
         # save book
         for i, page in enumerate(self.__pages):
-            fn = f"{filename}_{i}.jpg"
+            fn = f"{file_name}_{i}.jpg"
             # save page image
             page["image"].save(fn)
             # add contents of that image
             book[fn] = {"cards": page["cards"]}
 
         # update book.yml file
-        with open("book.yml", "w") as file:
+        with open(book_yml_name, "w") as file:
             yaml.dump(book, file, Dumper=yaml.Dumper)
-
-        # invert book
-        inverse_book: dict[Code, dict[str, any]] = {}
-
-        for fn, content in book.items():
-            inverse_book |= {
-                str(card.code): {
-                    "card": card,
-                    "file": fn,
-                    "index": i
-                } for i, card in enumerate(content["cards"])
-            }
-
-        # write inverse_book.yml file
-        with open("inverse_book.yml", "w") as file:
-            yaml.dump(inverse_book, file, Dumper=yaml.Dumper)
