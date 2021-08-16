@@ -7,6 +7,8 @@ from .cards import Cards
 
 class Opus(Cards):
     def __init__(self, opus_id: str):
+        super().__init__()
+
         logger = logging.getLogger(__name__)
 
         if opus_id.isnumeric():
@@ -33,16 +35,16 @@ class Opus(Cards):
             self.__filename = "?"
             params = {"set": "?"}
 
-        super().__init__(params)
+        self._load(params)
 
         # remove reprints
         for card in self:
-            if not card.code.startswith(self.__number + "-"):
+            if not card.code.opus == self.__number:
                 self.remove(card)
 
         # sort cards by opus, then serial
-        self.sort(key=lambda x: x.serial)
-        self.sort(key=lambda x: x.opus)
+        self.sort(key=lambda x: x.code.serial)
+        self.sort(key=lambda x: x.code.opus)
 
         for card in self:
             logger.info(f"imported card {card}")

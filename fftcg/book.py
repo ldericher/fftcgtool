@@ -4,6 +4,7 @@ import yaml
 from PIL import Image
 
 from .cards import Cards
+from .code import Code
 from .grid import Grid
 from .imageloader import ImageLoader
 
@@ -55,24 +56,39 @@ class Book:
         return self.__pages[index]["image"]
 
     def save(self, filename: str) -> None:
-        pages: dict[str, dict[str, any]]
+        book: dict[str, dict[str, any]]
 
-        # load pages.yml file
+        # load book.yml file
         try:
-            with open("pages.yml", "r") as file:
-                pages = yaml.load(file, Loader=yaml.Loader)
+            with open("book.yml", "r") as file:
+                book = yaml.load(file, Loader=yaml.Loader)
         except FileNotFoundError:
-            pages = {}
+            book = {}
 
         # save book
         for i, page in enumerate(self.__pages):
             fn = f"{filename}_{i}.jpg"
             # save page image
             page["image"].save(fn)
-            # add contents of image
-            pages[fn] = {}
-            pages[fn]["cards"] = page["cards"]
+            # add contents of that image
+            book[fn] = {"cards": page["cards"]}
 
-        # update pages.yml file
-        with open("pages.yml", "w") as file:
-            yaml.dump(pages, file, Dumper=yaml.Dumper)
+        # update book.yml file
+        with open("book.yml", "w") as file:
+            yaml.dump(book, file, Dumper=yaml.Dumper)
+
+        # invert book
+        inverse_book: dict[Code, dict[str, any]] = {}
+
+        for fn, content in book.items():
+            inverse_book |= {
+                str(card.code): {
+                    "card": card,
+                    "file": fn,
+                    "index": i
+                } for i, card in enumerate(content["cards"])
+            }
+
+        # write inverse_book.yml file
+        with open("inverse_book.yml", "w") as file:
+            yaml.dump(inverse_book, file, Dumper=yaml.Dumper)
