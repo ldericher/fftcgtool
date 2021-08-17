@@ -5,8 +5,9 @@ from .code import Code
 
 
 class TTSDeck(list[dict[str, any]]):
-    def __init__(self, codes: list[Code], carddb: CardDB):
-        super().__init__([carddb[str(code)] for code in codes])
+    def __init__(self, codes: list[Code]):
+        carddb = CardDB.get()
+        super().__init__([carddb[code] for code in codes])
 
     def __str__(self) -> str:
         face_urls = list(set([entry["file"] for entry in self]))

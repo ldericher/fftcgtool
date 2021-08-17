@@ -3,6 +3,7 @@ import logging
 import roman
 
 from .cards import Cards
+from .ttsdeck import TTSDeck
 
 
 class Opus(Cards):
@@ -60,3 +61,32 @@ class Opus(Cards):
     @property
     def filename(self) -> str:
         return self.__filename
+
+    @property
+    def elemental_decks(self) -> list[TTSDeck]:
+        if self.name in ["Promo", "Boss Deck Chaos"]:
+            return [TTSDeck([
+                card.code
+                for card in self
+            ])]
+
+        else:
+            def element_filter(element: str):
+                return lambda card: card.elements == [element]
+
+            # simple cases: create lambdas for base elemental decks
+            base_elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"]
+            filters = [element_filter(elem) for elem in base_elements]
+
+            filters += [
+                # light/darkness elemental deck
+                lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
+                # multi element deck
+                lambda card: len(card.elements) > 1,
+            ]
+
+            return [TTSDeck([
+                card.code
+                for card in self
+                if f(card)
+            ]) for f in filters]

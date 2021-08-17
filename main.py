@@ -5,11 +5,6 @@ import os
 
 import fftcg
 
-# constants
-GRID = 10, 7  # default in TTsim: 10 columns, 7 rows
-RESOLUTION = 429, 600  # default in TTsim: 480x670 pixels per card
-BOOK_YML_NAME = "book.yml"
-
 
 def main() -> None:
     # set up CLI
@@ -45,40 +40,15 @@ def main() -> None:
 
     # main program
     opus = fftcg.Opus(args.opus_id)
-    book = fftcg.Book(opus, GRID, RESOLUTION, "eg", args.num_threads)
-    book.save(opus.filename, BOOK_YML_NAME)
+    book = fftcg.Book(opus, "eg", args.num_threads)
+    book.save(opus.filename)
 
     # create elemental decks for opus
-    carddb = fftcg.CardDB(BOOK_YML_NAME)
+    carddb = fftcg.CardDB.get()
+    carddb.load()
 
-    def opus_filter(card: fftcg.Card):
-        return card.code.opus == opus.number
-
-    filters: list
-    if opus.number == "PR":
-        filters = [[opus_filter]]
-
-    else:
-        def element_filter(element: str):
-            return lambda card: card.elements == [element]
-
-        # simple cases: create lambdas for base elemental decks
-        base_elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"]
-        element_filters = [element_filter(elem) for elem in base_elements]
-
-        element_filters += [
-            # light/darkness elemental deck
-            lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
-            # multi element deck
-            lambda card: len(card.elements) > 1,
-        ]
-
-        # add in the opus_filter for all elemental decks
-        filters = list(zip([opus_filter] * len(element_filters), element_filters))
-
-    # make the decks
-    for f in filters:
-        print(carddb.make_deck(f))
+    for deck in opus.elemental_decks:
+        print(deck)
 
     # bye
     logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")

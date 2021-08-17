@@ -6,6 +6,8 @@ import threading
 import requests
 from PIL import Image
 
+from fftcg.utils import RESOLUTION
+
 
 class ImageLoader(threading.Thread):
     def __init__(self, url_queue: queue.Queue, resolution: tuple[int, int], language: str):
@@ -44,14 +46,14 @@ class ImageLoader(threading.Thread):
             self.__queue.task_done()
 
     @classmethod
-    def load(cls, urls: list[str], resolution: tuple[int, int], language: str, num_threads: int) -> list[Image.Image]:
+    def load(cls, urls: list[str], language: str, num_threads: int) -> list[Image.Image]:
         url_queue = queue.Queue()
         for url in urls:
             url_queue.put(url)
 
         loaders = []
         for _ in range(num_threads):
-            loader = cls(url_queue, resolution, language)
+            loader = cls(url_queue, RESOLUTION, language)
             loaders.append(loader)
             loader.start()
 

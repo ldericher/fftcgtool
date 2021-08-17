@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 from PIL import Image
 
 _Point = tuple[int, int]
 
 
-class Grid(_Point):
-    def __mul__(self, other: _Point) -> _Point:
-        other = Grid(other)
-        return self.x * other.x, self.y * other.y
+class Grid(tuple[int, int]):
+    def __mul__(self, other: Grid) -> Grid:
+        return Grid((self.x * other.x, self.y * other.y))
 
     @property
     def x(self):

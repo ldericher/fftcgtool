@@ -1,33 +1,12 @@
+from __future__ import annotations
+
 import json
 import re
 
 import yaml
 
 from .code import Code
-
-
-def encircle_symbol(symbol: str, negative: bool):
-    symbol = symbol[0].upper()
-
-    base_symbols: tuple[str, str] = "", ""
-    if symbol.isalpha():
-        if negative:
-            base_symbols = "A", "🅐"
-        else:
-            base_symbols = "A", "Ⓐ"
-    elif symbol == "0":
-        if negative:
-            base_symbols = "0", "🄌"
-        else:
-            base_symbols = "0", "⓪"
-    elif symbol.isnumeric():
-        if negative:
-            base_symbols = "1", "➊"
-        else:
-            base_symbols = "1", "①"
-
-    symbol_num = ord(symbol) - ord(base_symbols[0])
-    return chr(ord(base_symbols[1]) + symbol_num)
+from .utils import encircle_symbol
 
 
 class Card(yaml.YAMLObject):
@@ -53,7 +32,7 @@ class Card(yaml.YAMLObject):
         self.__text = text
 
     @classmethod
-    def from_data(cls, data: dict[str, any], language: str):
+    def from_data(cls, data: dict[str, any], language: str) -> Card:
         if not data:
             return cls(
                 code=Code(""),
