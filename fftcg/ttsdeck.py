@@ -11,36 +11,41 @@ class TTSDeck(Cards):
         super().__init__(name)
         self.__description = description
 
+        # get cards from carddb
         carddb = CardDB.get()
         self.extend([carddb[code] for code in codes])
 
-    def __str__(self) -> str:
-        face_urls = list(set([
+        # unique face urls used
+        unique_face_urls = set([
             card.face_url
             for card in self
-        ]))
+        ])
 
+        # lookup for indices of urls
+        self.__url_indices = {
+            url: i + 1
+            for i, url in enumerate(unique_face_urls)
+        }
+
+    @property
+    def tts_object(self) -> dict[str, any]:
+        # build the "CustomDeck" dictionary
         custom_deck = {
-            str(i + 1): {
+            str(i): {
                 "NumWidth": "10",
                 "NumHeight": "7",
                 "FaceURL": url,
                 "BackURL": CARD_BACK_URL,
-            } for i, url in enumerate(face_urls)
+            } for url, i in self.__url_indices.items()
         }
 
-        custom_deck_inv = {
-            url: i + 1
-            for i, url in enumerate(face_urls)
-        }
-
+        # values both in main deck and each contained card
         common_dict = {
             "Transform": {
                 "scaleX": 2.17822933,
                 "scaleY": 1.0,
                 "scaleZ": 2.17822933
             },
-
             "Locked": False,
             "Grid": True,
             "Snap": True,
@@ -50,40 +55,42 @@ class TTSDeck(Cards):
             "GridProjection": False,
         }
 
+        # cards contained in deck
         contained_objects = [
             {
-                "Name": "Card",
                 "Nickname": card.name,
                 "Description": card.text,
+                "CardID": 100 * self.__url_indices[card.face_url] + card.index,
 
-                "CardID": 100 * custom_deck_inv[card.face_url] + card.index,
-
+                "Name": "Card",
                 "Hands": True,
                 "SidewaysCard": False,
             } | common_dict for card in self
         ]
 
+        # extract the card ids
         deck_ids = [
             contained_object["CardID"]
             for contained_object in contained_objects
         ]
 
-        json_dict = {"ObjectStates": [
+        # create the deck dictionary
+        return {"ObjectStates": [
             {
-                "Name": "Deck",
                 "Nickname": self.name,
                 "Description": self.__description,
-
-                "Hands": False,
-                "SidewaysCard": False,
-
                 "DeckIDs": deck_ids,
                 "CustomDeck": custom_deck,
                 "ContainedObjects": contained_objects,
+
+                "Name": "Deck",
+                "Hands": False,
+                "SidewaysCard": False,
             } | common_dict
         ]}
 
-        return json.dumps(json_dict, indent=2)
-
-    def save(self, file_name: str) -> None:
-        pass
+    def save(self) -> None:
+        # only save if the deck contains cards
+        if self:
+            with open(f"{self.file_name}.json", "w") as file:
+                json.dump(self.tts_object, file, indent=2)

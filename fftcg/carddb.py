@@ -41,7 +41,3 @@ class CardDB:
                 card.code: card
                 for card in cards
             }
-
-        # write carddb.yml file
-        with open("carddb.yml", "w") as file:
-            yaml.dump(self.__content, file, Dumper=yaml.Dumper)

@@ -73,7 +73,7 @@ class Opus(Cards):
 
             filters |= {
                 # light/darkness elemental deck
-                "Light/Darkness": lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
+                "Light-Darkness": lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
                 # multi element deck
                 "Multi": lambda card: len(card.elements) > 1,
             }

@@ -49,7 +49,7 @@ def main() -> None:
 
     # create elemental decks for opus
     for deck in opus.elemental_decks:
-        print(deck)
+        deck.save()
 
     # bye
     logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")

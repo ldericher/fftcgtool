@@ -15,7 +15,6 @@ class Book:
         # sort cards by element, then alphabetically
         cards.sort(key=lambda x: x.name)
         cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
-        self.__file_name = cards.file_name
 
         # all card face URLs
         urls = [f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg" for card in cards]
@@ -31,7 +30,7 @@ class Book:
 
         page_images: list[Image.Image]
         page_cards: Cards
-        for page_images, page_cards in zip(GRID.chunks(images), GRID.chunks(cards)):
+        for page_num, (page_images, page_cards) in enumerate(zip(GRID.chunks(images), GRID.chunks(cards))):
             # create book page Image
             page_image = Image.new("RGB", GRID * RESOLUTION)
             logger.info(f"New image: {page_image.size[0]}x{page_image.size[1]}")
@@ -49,6 +48,7 @@ class Book:
 
             # save page
             self.__pages.append({
+                "file_name": f"{cards.file_name}_{page_num}.jpg",
                 "image": page_image,
                 "cards": page_cards,
             })
@@ -56,9 +56,8 @@ class Book:
     def save(self) -> None:
         # save images
         for i, page in enumerate(self.__pages):
-            fn = f"{self.__file_name}_{i}.jpg"
             # save page image
-            page["image"].save(fn)
+            page["image"].save(page["file_name"])
 
         book: dict[str, Cards]
         try:
@@ -69,13 +68,12 @@ class Book:
 
         # save book
         for i, page in enumerate(self.__pages):
-            fn = f"{self.__file_name}_{i}.jpg"
             # ask for upload
-            face_url = input(f"Upload '{fn}' and paste URL: ")
+            face_url = input(f"Upload '{page['file_name']}' and paste URL: ")
             for card in page["cards"]:
                 card.face_url = face_url
             # add contents of that image
-            book[fn] = page["cards"]
+            book[page["file_name"]] = page["cards"]
 
         # update book.yml file
         with open(BOOK_YML_NAME, "w") as file:
