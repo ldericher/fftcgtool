@@ -41,12 +41,13 @@ def main() -> None:
     # main program
     opus = fftcg.Opus(args.opus_id)
     book = fftcg.Book(opus, "eg", args.num_threads)
-    book.save(opus.filename)
+    book.save(opus.file_name)
 
-    # create elemental decks for opus
+    # load the current carddb
     carddb = fftcg.CardDB.get()
     carddb.load()
 
+    # create elemental decks for opus
     for deck in opus.elemental_decks:
         print(deck)
 

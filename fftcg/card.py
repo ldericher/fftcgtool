@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import re
 
 import yaml
@@ -22,8 +21,6 @@ class Card(yaml.YAMLObject):
         "光": "Light",
         "闇": "Darkness"
     }
-
-    __ELEMENTS = "".join(__ELEMENTS_MAP.keys())
 
     def __init__(self, code, elements, name, text):
         self.__code = code
@@ -55,15 +52,15 @@ class Card(yaml.YAMLObject):
             # place other letter and numerical cost symbols
             text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE)
             # place elemental cost symbols
-            text = re.sub(rf"《([{Card.__ELEMENTS}])》", sub_elements, text, flags=re.IGNORECASE)
+            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_MAP.keys())}])》", sub_elements, text, flags=re.IGNORECASE)
             # place dull symbols
             text = text.replace("《ダル》", "[⤵]")
             # replace formatting hints with brackets
-            text = re.sub(r"\[\[[a-z]\]\]([^\[]*?)\s*\[\[/\]\]\s*", r"[\1] ", text, flags=re.IGNORECASE)
+            text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE)
             # place EX-BURST markers
-            text = re.sub(r"\[\[ex\]\]\s*EX BURST\s*\[\[/\]\]\s*", r"[EX BURST] ", text, flags=re.IGNORECASE)
+            text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text, flags=re.IGNORECASE)
             # place line breaks
-            text = re.sub(r"\s*\[\[br\]\]\s*", "\n\n", text, flags=re.IGNORECASE)
+            text = re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE)
 
             return cls(
                 code=Code(data["Code"]),
@@ -74,9 +71,6 @@ class Card(yaml.YAMLObject):
 
     def __str__(self) -> str:
         return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.code})"
-
-    def to_json(self) -> str:
-        return json.dumps(self, default=lambda o: o.__dict__)
 
     # 6-048C
     @property

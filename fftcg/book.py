@@ -5,7 +5,7 @@ from PIL import Image
 
 from .cards import Cards
 from .imageloader import ImageLoader
-from .utils import GRID, RESOLUTION, BOOK_YML_NAME
+from .utils import GRID, RESOLUTION, BOOK_YML_NAME, CARD_BACK_URL
 
 
 class Book:
@@ -18,10 +18,8 @@ class Book:
 
         # all card face URLs
         urls = [f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg" for card in cards]
-        # card back URL (image by Aurik)
-        urls.append(
-            "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
-        )
+        # card back URL
+        urls.append(CARD_BACK_URL)
 
         # multi-threaded download
         images = ImageLoader.load(urls, language, num_threads)

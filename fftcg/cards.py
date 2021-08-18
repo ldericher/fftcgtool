@@ -6,6 +6,22 @@ from .card import Card
 class Cards(list[Card]):
     __API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
+    def __init__(self, name):
+        super().__init__()
+
+        self.__name = name
+
+    def __str__(self) -> str:
+        return f"[{', '.join(str(card) for card in self)}]"
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def file_name(self) -> str:
+        return self.name.lower().replace(" ", "_")
+
     def _load(self, params: dict[str, any]):
         # required params:
         #  text
@@ -20,6 +36,3 @@ class Cards(list[Card]):
         req = requests.post(Cards.__API_URL, json=params)
         self.clear()
         self.extend([Card.from_data(card_data, "EN") for card_data in req.json()["cards"]])
-
-    def __str__(self) -> str:
-        return "\n".join(str(card) for card in self)

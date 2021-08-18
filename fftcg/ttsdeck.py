@@ -2,12 +2,16 @@ import json
 
 from .carddb import CardDB
 from .code import Code
+from .utils import CARD_BACK_URL
 
 
 class TTSDeck(list[dict[str, any]]):
-    def __init__(self, codes: list[Code]):
+    def __init__(self, codes: list[Code], name: str, description: str):
         carddb = CardDB.get()
         super().__init__([carddb[code] for code in codes])
+
+        self.__name = name
+        self.__description = description
 
     def __str__(self) -> str:
         face_urls = list(set([entry["file"] for entry in self]))
@@ -17,7 +21,7 @@ class TTSDeck(list[dict[str, any]]):
                 "NumWidth": "10",
                 "NumHeight": "7",
                 "FaceURL": url,
-                "BackURL": "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/",
+                "BackURL": CARD_BACK_URL,
             } for i, url in enumerate(face_urls)
         }
 
@@ -63,8 +67,8 @@ class TTSDeck(list[dict[str, any]]):
         jsondict = {"ObjectStates": [
             {
                 "Name": "Deck",
-                "Nickname": "TODO Deck Name",
-                "Description": "TODO Deck Description",
+                "Nickname": self.__name,
+                "Description": self.__description,
 
                 "Hands": False,
                 "SidewaysCard": False,
@@ -76,3 +80,6 @@ class TTSDeck(list[dict[str, any]]):
         ]}
 
         return json.dumps(jsondict, indent=2)
+
+    def save(self, file_name: str) -> None:
+        pass
