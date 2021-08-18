@@ -2,15 +2,11 @@ from __future__ import annotations
 
 import re
 
-import yaml
-
 from .code import Code
 from .utils import encircle_symbol
 
 
-class Card(yaml.YAMLObject):
-    yaml_tag = u'!Card'
-
+class Card:
     __ELEMENTS_MAP = {
         "火": "Fire",
         "氷": "Ice",
@@ -22,11 +18,14 @@ class Card(yaml.YAMLObject):
         "闇": "Darkness"
     }
 
-    def __init__(self, code, elements, name, text):
+    def __init__(self, code: Code, elements: list[str], name: str, text: str, face_url: str = "", index: int = 0):
         self.__code = code
         self.__elements = elements
         self.__name = name
         self.__text = text
+
+        self.__face_url = face_url
+        self.__index = index
 
     @classmethod
     def from_data(cls, data: dict[str, any], language: str) -> Card:
@@ -34,8 +33,8 @@ class Card(yaml.YAMLObject):
             return cls(
                 code=Code(""),
                 elements=[],
-                name=None,
-                text=None,
+                name="",
+                text="",
             )
 
         else:
@@ -88,3 +87,19 @@ class Card(yaml.YAMLObject):
     @property
     def elements(self) -> list[str]:
         return self.__elements
+
+    @property
+    def face_url(self) -> str:
+        return self.__face_url
+
+    @face_url.setter
+    def face_url(self, face_url: str) -> None:
+        self.__face_url = face_url
+
+    @property
+    def index(self) -> int:
+        return self.__index
+
+    @index.setter
+    def index(self, index: int) -> None:
+        self.__index = index

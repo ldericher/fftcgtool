@@ -14,15 +14,7 @@ class Cards(list[Card]):
     def __str__(self) -> str:
         return f"[{', '.join(str(card) for card in self)}]"
 
-    @property
-    def name(self) -> str:
-        return self.__name
-
-    @property
-    def file_name(self) -> str:
-        return self.name.lower().replace(" ", "_")
-
-    def _load(self, params: dict[str, any]):
+    def _load(self, params: dict[str, any]) -> None:
         # required params:
         #  text
         # supported params:
@@ -36,3 +28,11 @@ class Cards(list[Card]):
         req = requests.post(Cards.__API_URL, json=params)
         self.clear()
         self.extend([Card.from_data(card_data, "EN") for card_data in req.json()["cards"]])
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def file_name(self) -> str:
+        return self.name.lower().replace(" ", "_")

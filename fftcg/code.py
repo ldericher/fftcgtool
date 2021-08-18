@@ -1,11 +1,9 @@
+from __future__ import annotations
+
 import re
 
-import yaml
 
-
-class Code(yaml.YAMLObject):
-    yaml_tag = u'!Code'
-
+class Code:
     __RE_NUM = re.compile(r"([0-9]+)-([0-9]+)([CRHLS])")
     __RE_PROMO = re.compile(r"(PR)-([0-9]+)")
     __RE_BOSS = re.compile(r"(B)-([0-9]+)")
@@ -35,6 +33,12 @@ class Code(yaml.YAMLObject):
 
     def __str__(self) -> str:
         return f"{self.__opus}-{self.__serial}{self.__rarity}"
+
+    def __hash__(self) -> hash:
+        return hash(str(self))
+
+    def __eq__(self, other: Code):
+        return str(self) == str(other)
 
     @property
     def opus(self) -> str:

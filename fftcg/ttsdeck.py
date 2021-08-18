@@ -1,20 +1,24 @@
 import json
 
 from .carddb import CardDB
+from .cards import Cards
 from .code import Code
 from .utils import CARD_BACK_URL
 
 
-class TTSDeck(list[dict[str, any]]):
+class TTSDeck(Cards):
     def __init__(self, codes: list[Code], name: str, description: str):
-        carddb = CardDB.get()
-        super().__init__([carddb[code] for code in codes])
-
-        self.__name = name
+        super().__init__(name)
         self.__description = description
 
+        carddb = CardDB.get()
+        self.extend([carddb[code] for code in codes])
+
     def __str__(self) -> str:
-        face_urls = list(set([entry["file"] for entry in self]))
+        face_urls = list(set([
+            card.face_url
+            for card in self
+        ]))
 
         custom_deck = {
             str(i + 1): {
@@ -49,14 +53,14 @@ class TTSDeck(list[dict[str, any]]):
         contained_objects = [
             {
                 "Name": "Card",
-                "Nickname": entry["card"].name,
-                "Description": entry["card"].text,
+                "Nickname": card.name,
+                "Description": card.text,
 
-                "CardID": 100 * custom_deck_inv[entry["file"]] + entry["index"],
+                "CardID": 100 * custom_deck_inv[card.face_url] + card.index,
 
                 "Hands": True,
                 "SidewaysCard": False,
-            } | common_dict for entry in self
+            } | common_dict for card in self
         ]
 
         deck_ids = [
@@ -64,10 +68,10 @@ class TTSDeck(list[dict[str, any]]):
             for contained_object in contained_objects
         ]
 
-        jsondict = {"ObjectStates": [
+        json_dict = {"ObjectStates": [
             {
                 "Name": "Deck",
-                "Nickname": self.__name,
+                "Nickname": self.name,
                 "Description": self.__description,
 
                 "Hands": False,
@@ -79,7 +83,7 @@ class TTSDeck(list[dict[str, any]]):
             } | common_dict
         ]}
 
-        return json.dumps(jsondict, indent=2)
+        return json.dumps(json_dict, indent=2)
 
     def save(self, file_name: str) -> None:
         pass

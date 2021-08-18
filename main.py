@@ -41,7 +41,7 @@ def main() -> None:
     # main program
     opus = fftcg.Opus(args.opus_id)
     book = fftcg.Book(opus, "eg", args.num_threads)
-    book.save(opus.file_name)
+    book.save()
 
     # load the current carddb
     carddb = fftcg.CardDB.get()

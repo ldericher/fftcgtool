@@ -15,6 +15,7 @@ class Book:
         # sort cards by element, then alphabetically
         cards.sort(key=lambda x: x.name)
         cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
+        self.__file_name = cards.file_name
 
         # all card face URLs
         urls = [f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg" for card in cards]
@@ -27,6 +28,9 @@ class Book:
         back_image = images.pop(-1)
 
         self.__pages = []
+
+        page_images: list[Image.Image]
+        page_cards: Cards
         for page_images, page_cards in zip(GRID.chunks(images), GRID.chunks(cards)):
             # create book page Image
             page_image = Image.new("RGB", GRID * RESOLUTION)
@@ -39,16 +43,24 @@ class Book:
             # paste card back in last position
             GRID.paste(page_image, GRID.capacity, back_image)
 
+            # set card indices
+            for i, card in enumerate(page_cards):
+                card.index = i
+
             # save page
             self.__pages.append({
                 "image": page_image,
                 "cards": page_cards,
             })
 
-    def save(self, file_name: str) -> None:
-        book: dict[str, dict[str, any]]
+    def save(self) -> None:
+        # save images
+        for i, page in enumerate(self.__pages):
+            fn = f"{self.__file_name}_{i}.jpg"
+            # save page image
+            page["image"].save(fn)
 
-        # load book.yml file
+        book: dict[str, Cards]
         try:
             with open(BOOK_YML_NAME, "r") as file:
                 book = yaml.load(file, Loader=yaml.Loader)
@@ -57,11 +69,13 @@ class Book:
 
         # save book
         for i, page in enumerate(self.__pages):
-            fn = f"{file_name}_{i}.jpg"
-            # save page image
-            page["image"].save(fn)
+            fn = f"{self.__file_name}_{i}.jpg"
+            # ask for upload
+            face_url = input(f"Upload '{fn}' and paste URL: ")
+            for card in page["cards"]:
+                card.face_url = face_url
             # add contents of that image
-            book[fn] = {"cards": page["cards"]}
+            book[fn] = page["cards"]
 
         # update book.yml file
         with open(BOOK_YML_NAME, "w") as file:

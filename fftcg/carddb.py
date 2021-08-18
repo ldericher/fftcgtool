@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import yaml
 
+from fftcg import Card
 from fftcg.code import Code
 from fftcg.utils import BOOK_YML_NAME
 
@@ -17,10 +18,10 @@ class CardDB:
         return CardDB.__instance
 
     def __init__(self):
-        self.__content: dict[Code, dict[str, any]] = {}
+        self.__content: dict[Code, Card] = {}
 
-    def __getitem__(self, code: Code) -> dict[str, any]:
-        return self.__content[str(code)]
+    def __getitem__(self, code: Code) -> Card:
+        return self.__content[code]
 
     def load(self):
         # load book.yml file
@@ -35,26 +36,12 @@ class CardDB:
         # every card is indexable by its code
         self.__content.clear()
 
-        for file_name, content in book.items():
+        for file_name, cards in book.items():
             self.__content |= {
-                str(card.code): {
-                    "card": card,
-                    "file": file_name,
-                    "index": i,
-                } for i, card in enumerate(content["cards"])
+                card.code: card
+                for card in cards
             }
 
         # write carddb.yml file
         with open("carddb.yml", "w") as file:
             yaml.dump(self.__content, file, Dumper=yaml.Dumper)
-
-    # def make_deck(self, filters):
-    #     # filter codes by card criteria
-    #     codes = [
-    #         content["card"].code
-    #         for content in self.__content.values()
-    #         if all([f(content["card"]) for f in filters])
-    #     ]
-    #
-    #     from .ttsdeck import TTSDeck
-    #     return TTSDeck(codes)
