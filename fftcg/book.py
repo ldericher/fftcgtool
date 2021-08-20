@@ -17,12 +17,15 @@ class Book:
         cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
 
         # all card face URLs
-        urls = [f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg" for card in cards]
+        urls = [
+            f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg"
+            for card in cards
+        ]
         # card back URL
         urls.append(CARD_BACK_URL)
 
         # multi-threaded download
-        images = ImageLoader.load(urls, language, num_threads)
+        images = ImageLoader.load(urls, num_threads)
         # card back Image
         back_image = images.pop(-1)
 

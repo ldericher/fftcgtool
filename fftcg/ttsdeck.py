@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import json
+
+import requests
 
 from .carddb import CardDB
 from .cards import Cards
@@ -13,7 +17,10 @@ class TTSDeck(Cards):
 
         # get cards from carddb
         carddb = CardDB.get()
-        self.extend([carddb[code] for code in codes])
+        self.extend([
+            carddb[code]
+            for code in codes
+        ])
 
         # unique face urls used
         unique_face_urls = set([
@@ -26,6 +33,20 @@ class TTSDeck(Cards):
             url: i + 1
             for i, url in enumerate(unique_face_urls)
         }
+
+    __FFDECKS_API_URL = "https://ffdecks.com/api/deck"
+
+    @classmethod
+    def from_ffdecks_deck(cls, deck_id: str) -> TTSDeck:
+        req = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
+        codes = [
+            Code(card["card"]["serial_number"])
+            for card in req.json()["cards"]
+        ]
+        name = req.json()["name"]
+        description = req.json()["description"]
+
+        return cls(codes, name, description)
 
     @property
     def tts_object(self) -> dict[str, any]:

@@ -28,7 +28,7 @@ class Card:
         self.__index = index
 
     @classmethod
-    def from_data(cls, data: dict[str, any], language: str) -> Card:
+    def from_square_api_data(cls, data: dict[str, any], language: str) -> Card:
         if not data:
             return cls(
                 code=Code(""),
@@ -63,7 +63,10 @@ class Card:
 
             return cls(
                 code=Code(data["Code"]),
-                elements=[Card.__ELEMENTS_MAP[element] for element in data["Element"].split("/")],
+                elements=[
+                    Card.__ELEMENTS_MAP[element]
+                    for element in data["Element"].split("/")
+                ],
                 name=data[f"Name_{language}"],
                 text=text,
             )

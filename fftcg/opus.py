@@ -1,16 +1,20 @@
 import logging
 
+import requests
 import roman
 
+from . import Card
 from .cards import Cards
 from .ttsdeck import TTSDeck
 
 
 class Opus(Cards):
-    def __init__(self, opus_id: str):
+    __SQUARE_API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
+    def __init__(self, opus_id: str):
         logger = logging.getLogger(__name__)
 
+        params: dict[str, any]
         if opus_id.isnumeric():
             name = f"Opus {opus_id}"
             self.__number = opus_id
@@ -32,8 +36,22 @@ class Opus(Cards):
             self.__filename = "?"
             params = {"set": "?"}
 
-        super().__init__(name)
-        self._load(params)
+        # required params:
+        #  text
+        # supported params:
+        #  [str] text, language, code, multicard="○"|"", ex_burst="○"|"", special="《S》"|""
+        #  [array] type, element, cost, rarity, power, category_1, set
+        #  [int] exactmatch=0|1
+
+        if "text" not in params:
+            params["text"] = ""
+
+        # get cards from square api
+        req = requests.post(Opus.__SQUARE_API_URL, json=params)
+        super().__init__(name, [
+            Card.from_square_api_data(card_data, "EN")
+            for card_data in req.json()["cards"]
+        ])
 
         # remove reprints
         for card in self:
@@ -69,7 +87,10 @@ class Opus(Cards):
 
             # simple cases: create lambdas for base elemental decks
             base_elements = ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water"]
-            filters = {elem: element_filter(elem) for elem in base_elements}
+            filters = {
+                elem: element_filter(elem)
+                for elem in base_elements
+            }
 
             filters |= {
                 # light/darkness elemental deck

@@ -4,7 +4,7 @@ import re
 
 
 class Code:
-    __RE_NUM = re.compile(r"([0-9]+)-([0-9]+)([CRHLS])")
+    __RE_NUM = re.compile(r"([0-9]+)-([0-9]+)([CRHLS]?)")
     __RE_PROMO = re.compile(r"(PR)-([0-9]+)")
     __RE_BOSS = re.compile(r"(B)-([0-9]+)")
 
@@ -32,7 +32,10 @@ class Code:
                 "?", "???", "?"
 
     def __str__(self) -> str:
-        return f"{self.__opus}-{self.__serial}{self.__rarity}"
+        return f"{self.__opus}-{self.__serial}"
+
+    def __repr__(self) -> str:
+        return f"Code(\"{self.__opus}-{self.__serial}{self.__rarity}\")"
 
     def __hash__(self) -> hash:
         return hash(str(self))
