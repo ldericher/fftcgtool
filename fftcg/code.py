@@ -32,16 +32,20 @@ class Code:
                 "?", "???", "?"
 
     def __str__(self) -> str:
-        return f"{self.__opus}-{self.__serial}"
+        return f"{self.__opus}-{self.__serial}{self.__rarity}"
 
     def __repr__(self) -> str:
-        return f"Code(\"{self.__opus}-{self.__serial}{self.__rarity}\")"
+        return f"Code(\"{str(self)}\")"
 
     def __hash__(self) -> hash:
-        return hash(str(self))
+        return hash(self.short)
 
     def __eq__(self, other: Code):
-        return str(self) == str(other)
+        return self.short == other.short
+
+    @property
+    def short(self) -> str:
+        return f"{self.__opus}-{self.__serial}"
 
     @property
     def opus(self) -> str:
