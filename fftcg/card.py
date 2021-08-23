@@ -47,13 +47,16 @@ class Card:
             def sub_elements(match: re.Match):
                 return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], False)
 
+            def load_name(language: Language) -> str:
+                return data[f"Name{language.key_suffix}"]
+
             def load_text(language: Language) -> str:
                 # load text
                 text = str(data[f"Text{language.key_suffix}"])
                 # place "S" symbols
                 text = text.replace("《S》", encircle_symbol("S", False))
                 # place other letter and numerical cost symbols
-                text = re.sub(r"《([\w])》", sub_encircle, text, flags=re.UNICODE)
+                text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE | re.UNICODE)
                 # place elemental cost symbols
                 text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
                 # place dull symbols
@@ -72,7 +75,7 @@ class Card:
                     Card.__ELEMENTS_MAP[element]
                     for element in data["Element"].split("/")
                 ],
-                name=data[f"Name{language.key_suffix}"],
+                name=load_name(language),
                 text=load_text(language),
             )
 
