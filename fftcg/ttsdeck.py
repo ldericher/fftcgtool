@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 
 import requests
 
 from .carddb import CardDB
 from .cards import Cards
 from .code import Code
-from .utils import CARD_BACK_URL
+from .utils import CARD_BACK_URL, DECKS_DIR_NAME
 
 
 class TTSDeck(Cards):
@@ -43,7 +44,7 @@ class TTSDeck(Cards):
             Code(card["card"]["serial_number"])
             for card in req.json()["cards"]
         ]
-        name = req.json()["name"]
+        name = f"{req.json()['name']} ({deck_id})"
         description = req.json()["description"]
 
         return cls(codes, name, description)
@@ -113,5 +114,8 @@ class TTSDeck(Cards):
     def save(self) -> None:
         # only save if the deck contains cards
         if self:
-            with open(f"{self.file_name}.json", "w") as file:
+            if not os.path.exists(DECKS_DIR_NAME):
+                os.mkdir(DECKS_DIR_NAME)
+
+            with open(os.path.join(DECKS_DIR_NAME, f"{self.file_name}.json"), "w") as file:
                 json.dump(self.tts_object, file, indent=2)

@@ -1,3 +1,5 @@
+import re
+
 from .card import Card
 
 
@@ -18,4 +20,5 @@ class Cards(list[Card]):
 
     @property
     def file_name(self) -> str:
-        return self.name.lower().replace(" ", "_")
+        val = self.name.lower().replace(" ", "_")
+        return re.sub(r"[^\w]", "", val, flags=re.UNICODE)

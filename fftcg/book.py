@@ -1,12 +1,13 @@
 import bz2
 import logging
+import os
 import pickle
 
 from PIL import Image
 
 from .cards import Cards
 from .imageloader import ImageLoader
-from .utils import GRID, RESOLUTION, BOOK_PICKLE_NAME, CARD_BACK_URL
+from .utils import GRID, RESOLUTION, CARDDB_FILE_NAME, CARD_BACK_URL, IMAGES_DIR_NAME
 
 
 class Book:
@@ -58,14 +59,17 @@ class Book:
             })
 
     def save(self) -> None:
+        if not os.path.exists(IMAGES_DIR_NAME):
+            os.mkdir(IMAGES_DIR_NAME)
+
         # save images
         for i, page in enumerate(self.__pages):
             # save page image
-            page["image"].save(page["file_name"])
+            page["image"].save(os.path.join(IMAGES_DIR_NAME, page["file_name"]))
 
         book: dict[str, Cards]
         try:
-            with bz2.BZ2File(BOOK_PICKLE_NAME, "r") as file:
+            with bz2.BZ2File(CARDDB_FILE_NAME, "r") as file:
                 book = pickle.load(file)
         except FileNotFoundError:
             book = {}
@@ -80,5 +84,5 @@ class Book:
             book[page["file_name"]] = page["cards"]
 
         # update book.yml file
-        with bz2.BZ2File(BOOK_PICKLE_NAME, "w") as file:
+        with bz2.BZ2File(CARDDB_FILE_NAME, "w") as file:
             pickle.dump(book, file)

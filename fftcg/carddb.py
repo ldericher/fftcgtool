@@ -5,7 +5,7 @@ import pickle
 
 from fftcg import Card
 from fftcg.code import Code
-from fftcg.utils import BOOK_PICKLE_NAME
+from fftcg.utils import CARDDB_FILE_NAME
 
 
 class CardDB:
@@ -28,7 +28,7 @@ class CardDB:
         # load book.yml file
         book: dict
         try:
-            with bz2.BZ2File(BOOK_PICKLE_NAME, "r") as file:
+            with bz2.BZ2File(CARDDB_FILE_NAME, "r") as file:
                 book = pickle.load(file)
         except FileNotFoundError:
             book = {}

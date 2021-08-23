@@ -5,6 +5,9 @@ import os
 
 import fftcg
 
+# constants
+OUT_DIR_NAME = "out"  # name of output directory
+
 
 def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     # import an opus
@@ -94,9 +97,10 @@ def main() -> None:
     )
 
     # output directory
-    if not os.path.exists("out"):
-        os.mkdir("out")
-    os.chdir("out")
+    if not os.path.exists(OUT_DIR_NAME):
+        os.mkdir(OUT_DIR_NAME)
+
+    os.chdir(OUT_DIR_NAME)
 
     # call function based on args
     args = parser.parse_args()
