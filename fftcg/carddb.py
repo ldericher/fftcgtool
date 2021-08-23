@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import yaml
+import pickle
 
 from fftcg import Card
 from fftcg.code import Code
-from fftcg.utils import BOOK_YML_NAME
+from fftcg.utils import BOOK_PICKLE_NAME
 
 
 class CardDB:
@@ -27,8 +27,8 @@ class CardDB:
         # load book.yml file
         book: dict
         try:
-            with open(BOOK_YML_NAME, "r") as file:
-                book = yaml.load(file, Loader=yaml.Loader)
+            with open(BOOK_PICKLE_NAME, "rb") as file:
+                book = pickle.load(file)
         except FileNotFoundError:
             book = {}
 

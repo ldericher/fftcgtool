@@ -1,11 +1,11 @@
 import logging
+import pickle
 
-import yaml
 from PIL import Image
 
 from .cards import Cards
 from .imageloader import ImageLoader
-from .utils import GRID, RESOLUTION, BOOK_YML_NAME, CARD_BACK_URL
+from .utils import GRID, RESOLUTION, BOOK_PICKLE_NAME, CARD_BACK_URL
 
 
 class Book:
@@ -64,8 +64,8 @@ class Book:
 
         book: dict[str, Cards]
         try:
-            with open(BOOK_YML_NAME, "r") as file:
-                book = yaml.load(file, Loader=yaml.Loader)
+            with open(BOOK_PICKLE_NAME, "rb") as file:
+                book = pickle.load(file)
         except FileNotFoundError:
             book = {}
 
@@ -79,5 +79,5 @@ class Book:
             book[page["file_name"]] = page["cards"]
 
         # update book.yml file
-        with open(BOOK_YML_NAME, "w") as file:
-            yaml.dump(book, file, Dumper=yaml.Dumper)
+        with open(BOOK_PICKLE_NAME, "wb") as file:
+            pickle.dump(book, file)
