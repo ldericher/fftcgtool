@@ -51,17 +51,17 @@ class Card:
             # place "S" symbols
             text = text.replace("《S》", encircle_symbol("S", False))
             # place other letter and numerical cost symbols
-            text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE)
+            text = re.sub(r"《([\w])》", sub_encircle, text, flags=re.UNICODE)
             # place elemental cost symbols
-            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.IGNORECASE)
+            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
             # place dull symbols
             text = text.replace("《ダル》", "[⤵]")
             # replace formatting hints with brackets
-            text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE)
+            text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
             # place EX-BURST markers
-            text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text, flags=re.IGNORECASE)
+            text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text, flags=re.IGNORECASE | re.UNICODE)
             # place line breaks
-            text = re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE)
+            text = re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
 
             return cls(
                 code=Code(data["Code"]),
