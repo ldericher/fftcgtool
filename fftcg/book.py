@@ -1,5 +1,5 @@
-import logging
 import bz2
+import logging
 import pickle
 
 from PIL import Image
