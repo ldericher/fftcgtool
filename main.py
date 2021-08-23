@@ -18,6 +18,7 @@ def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     # load the current carddb
     carddb = fftcg.CardDB.get()
     carddb.load()
+    carddb.update(opus)
 
     # create elemental decks for opus
     return opus.elemental_decks

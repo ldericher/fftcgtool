@@ -1,13 +1,11 @@
-import bz2
 import logging
 import os
-import pickle
 
 from PIL import Image
 
 from .cards import Cards
 from .imageloader import ImageLoader
-from .utils import GRID, RESOLUTION, CARDDB_FILE_NAME, CARD_BACK_URL, IMAGES_DIR_NAME
+from .utils import GRID, RESOLUTION, CARD_BACK_URL, IMAGES_DIR_NAME
 
 
 class Book:
@@ -33,8 +31,6 @@ class Book:
 
         self.__pages = []
 
-        page_images: list[Image.Image]
-        page_cards: Cards
         for page_num, (page_images, page_cards) in enumerate(zip(GRID.chunks(images), GRID.chunks(cards))):
             # create book page Image
             page_image = Image.new("RGB", GRID * RESOLUTION)
@@ -63,26 +59,16 @@ class Book:
             os.mkdir(IMAGES_DIR_NAME)
 
         # save images
-        for i, page in enumerate(self.__pages):
-            # save page image
-            page["image"].save(os.path.join(IMAGES_DIR_NAME, page["file_name"]))
+        for page in self.__pages:
+            page["file_name"] = os.path.join(IMAGES_DIR_NAME, page["file_name"])
+            page["image"].save(page["file_name"])
 
-        book: dict[str, Cards]
-        try:
-            with bz2.BZ2File(CARDDB_FILE_NAME, "r") as file:
-                book = pickle.load(file)
-        except FileNotFoundError:
-            book = {}
-
-        # save book
-        for i, page in enumerate(self.__pages):
-            # ask for upload
+        # ask for upload
+        for page in self.__pages:
             face_url = input(f"Upload '{page['file_name']}' and paste URL: ")
+
+            if not face_url:
+                face_url = f"file://{os.path.abspath(page['file_name'])}"
+
             for card in page["cards"]:
                 card.face_url = face_url
-            # add contents of that image
-            book[page["file_name"]] = page["cards"]
-
-        # update book.yml file
-        with bz2.BZ2File(CARDDB_FILE_NAME, "w") as file:
-            pickle.dump(book, file)

@@ -4,6 +4,7 @@ import bz2
 import pickle
 
 from fftcg import Card
+from fftcg.cards import Cards
 from fftcg.code import Code
 from fftcg.utils import CARDDB_FILE_NAME
 
@@ -24,21 +25,19 @@ class CardDB:
     def __getitem__(self, code: Code) -> Card:
         return self.__content[code]
 
-    def load(self):
-        # load book.yml file
-        book: dict
+    def update(self, cards: Cards):
+        for card in cards:
+            self.__content[card.code] = card
+
+        # pickle db file
+        with bz2.BZ2File(CARDDB_FILE_NAME, "w") as file:
+            pickle.dump(self.__content, file)
+
+    def load(self) -> None:
+        # unpickle db file
+        self.__content.clear()
         try:
             with bz2.BZ2File(CARDDB_FILE_NAME, "r") as file:
-                book = pickle.load(file)
+                self.__content |= pickle.load(file)
         except FileNotFoundError:
-            book = {}
-
-        # "invert" book into card database:
-        # every card is indexable by its code
-        self.__content.clear()
-
-        for file_name, cards in book.items():
-            self.__content |= {
-                card.code: card
-                for card in cards
-            }
+            pass
