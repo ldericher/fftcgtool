@@ -3,7 +3,7 @@ import logging
 import requests
 import roman
 
-from . import Card
+from .card import Card
 from .cards import Cards
 from .ttsdeck import TTSDeck
 

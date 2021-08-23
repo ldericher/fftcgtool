@@ -5,7 +5,7 @@ import multiprocessing
 import requests
 from PIL import Image
 
-from fftcg.utils import RESOLUTION
+from .utils import RESOLUTION
 
 
 class ImageLoader:

@@ -3,10 +3,10 @@ from __future__ import annotations
 import bz2
 import pickle
 
-from fftcg import Card
-from fftcg.cards import Cards
-from fftcg.code import Code
-from fftcg.utils import CARDDB_FILE_NAME
+from .card import Card
+from .cards import Cards
+from .code import Code
+from .utils import CARDDB_FILE_NAME
 
 
 class CardDB:
