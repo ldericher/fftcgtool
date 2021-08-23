@@ -7,15 +7,17 @@ from .utils import encircle_symbol
 
 
 class Card:
+    __ELEMENTS_JAP = [
+        "火", "氷", "風", "土", "雷", "水", "光", "闇"
+    ]
+
+    __ELEMENTS_ENG = [
+        "Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Darkness"
+    ]
+
     __ELEMENTS_MAP = {
-        "火": "Fire",
-        "氷": "Ice",
-        "風": "Wind",
-        "土": "Earth",
-        "雷": "Lightning",
-        "水": "Water",
-        "光": "Light",
-        "闇": "Darkness"
+        elem_j: elem_e
+        for elem_j, elem_e in zip(__ELEMENTS_JAP, __ELEMENTS_ENG)
     }
 
     def __init__(self, code: Code, elements: list[str], name: str, text: str, face_url: str = "", index: int = 0):
@@ -51,7 +53,7 @@ class Card:
             # place other letter and numerical cost symbols
             text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE)
             # place elemental cost symbols
-            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_MAP.keys())}])》", sub_elements, text, flags=re.IGNORECASE)
+            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.IGNORECASE)
             # place dull symbols
             text = text.replace("《ダル》", "[⤵]")
             # replace formatting hints with brackets
