@@ -31,7 +31,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # set up logging
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(threadName)s %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(processName)s %(message)s")
 
     # output directory
     if not os.path.exists("out"):
