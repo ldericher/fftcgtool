@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bz2
 import pickle
 
 from fftcg import Card
@@ -27,7 +28,7 @@ class CardDB:
         # load book.yml file
         book: dict
         try:
-            with open(BOOK_PICKLE_NAME, "rb") as file:
+            with bz2.BZ2File(BOOK_PICKLE_NAME, "r") as file:
                 book = pickle.load(file)
         except FileNotFoundError:
             book = {}

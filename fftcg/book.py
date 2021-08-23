@@ -1,4 +1,5 @@
 import logging
+import bz2
 import pickle
 
 from PIL import Image
@@ -64,7 +65,7 @@ class Book:
 
         book: dict[str, Cards]
         try:
-            with open(BOOK_PICKLE_NAME, "rb") as file:
+            with bz2.BZ2File(BOOK_PICKLE_NAME, "r") as file:
                 book = pickle.load(file)
         except FileNotFoundError:
             book = {}
@@ -79,5 +80,5 @@ class Book:
             book[page["file_name"]] = page["cards"]
 
         # update book.yml file
-        with open(BOOK_PICKLE_NAME, "wb") as file:
+        with bz2.BZ2File(BOOK_PICKLE_NAME, "w") as file:
             pickle.dump(book, file)
