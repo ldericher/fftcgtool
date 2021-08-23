@@ -5,11 +5,12 @@ from PIL import Image
 
 from .cards import Cards
 from .imageloader import ImageLoader
+from .language import Language
 from .utils import GRID, RESOLUTION, CARD_BACK_URL, IMAGES_DIR_NAME
 
 
 class Book:
-    def __init__(self, cards: Cards, language: str, num_threads: int):
+    def __init__(self, cards: Cards, language: Language, num_threads: int):
         logger = logging.getLogger(__name__)
 
         # sort cards by element, then alphabetically
@@ -18,7 +19,7 @@ class Book:
 
         # all card face URLs
         urls = [
-            f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language}.jpg"
+            f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language.image_suffix}.jpg"
             for card in cards
         ]
         # card back URL

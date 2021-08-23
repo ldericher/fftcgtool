@@ -5,28 +5,29 @@ import roman
 
 from .card import Card
 from .cards import Cards
+from .language import Language
 from .ttsdeck import TTSDeck
 
 
 class Opus(Cards):
     __SQUARE_API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
 
-    def __init__(self, opus_id: str):
+    def __init__(self, opus_id: str, language: Language):
         logger = logging.getLogger(__name__)
 
         params: dict[str, any]
         if opus_id.isnumeric():
-            name = f"Opus {opus_id}"
+            name = f"Opus {opus_id} ({language})"
             self.__number = opus_id
             params = {"set": [f"Opus {roman.toRoman(int(opus_id)).upper()}"]}
 
         elif opus_id == "chaos":
-            name = "Boss Deck Chaos"
+            name = f"Boss Deck Chaos ({language})"
             self.__number = "B"
-            params = {"set": [name]}
+            params = {"set": ["Boss Deck Chaos"]}
 
         elif opus_id == "promo":
-            name = "Promo"
+            name = f"Promo ({language})"
             self.__number = "PR"
             params = {"rarity": ["pr"]}
 
@@ -49,7 +50,7 @@ class Opus(Cards):
         # get cards from square api
         req = requests.post(Opus.__SQUARE_API_URL, json=params)
         super().__init__(name, [
-            Card.from_square_api_data(card_data, "EN")
+            Card.from_square_api_data(card_data, language)
             for card_data in req.json()["cards"]
         ])
 
@@ -71,7 +72,7 @@ class Opus(Cards):
 
     @property
     def elemental_decks(self) -> list[TTSDeck]:
-        if self.name in ["Promo", "Boss Deck Chaos"]:
+        if self.number in ["PR", "B"]:
             return [TTSDeck(
                 [
                     card.code

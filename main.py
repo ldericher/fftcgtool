@@ -11,8 +11,8 @@ OUT_DIR_NAME = "out"  # name of output directory
 
 def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     # import an opus
-    opus = fftcg.Opus(args.opus_id)
-    book = fftcg.Book(opus, "eg", args.num_requests)
+    opus = fftcg.Opus(args.opus_id, args.language)
+    book = fftcg.Book(opus, args.language, args.num_requests)
     book.save()
 
     # load the current carddb
@@ -40,6 +40,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="fftcgtool",
         description="Imports FFTCG cards for TT-Sim.",
+    )
+
+    parser.add_argument(
+        "-l", "--language",
+        type=fftcg.Language,
+        default="en",
+        metavar="LANGUAGE",
+        help="lang",
     )
 
     subparsers = parser.add_subparsers(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 from .code import Code
+from .language import Language
 from .utils import encircle_symbol
 
 
@@ -30,7 +31,7 @@ class Card:
         self.__index = index
 
     @classmethod
-    def from_square_api_data(cls, data: dict[str, any], language: str) -> Card:
+    def from_square_api_data(cls, data: dict[str, any], language: Language) -> Card:
         if not data:
             return cls(
                 code=Code(""),
@@ -46,22 +47,24 @@ class Card:
             def sub_elements(match: re.Match):
                 return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], False)
 
-            # load text
-            text = str(data[f"Text_{language}"])
-            # place "S" symbols
-            text = text.replace("《S》", encircle_symbol("S", False))
-            # place other letter and numerical cost symbols
-            text = re.sub(r"《([\w])》", sub_encircle, text, flags=re.UNICODE)
-            # place elemental cost symbols
-            text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
-            # place dull symbols
-            text = text.replace("《ダル》", "[⤵]")
-            # replace formatting hints with brackets
-            text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
-            # place EX-BURST markers
-            text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text, flags=re.IGNORECASE | re.UNICODE)
-            # place line breaks
-            text = re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
+            def load_text(language: Language) -> str:
+                # load text
+                text = str(data[f"Text{language.key_suffix}"])
+                # place "S" symbols
+                text = text.replace("《S》", encircle_symbol("S", False))
+                # place other letter and numerical cost symbols
+                text = re.sub(r"《([\w])》", sub_encircle, text, flags=re.UNICODE)
+                # place elemental cost symbols
+                text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
+                # place dull symbols
+                text = text.replace("《ダル》", "[⤵]")
+                # replace formatting hints with brackets
+                text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
+                # place EX-BURST markers
+                text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text,
+                              flags=re.IGNORECASE | re.UNICODE)
+                # place line breaks
+                return re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
 
             return cls(
                 code=Code(data["Code"]),
@@ -69,8 +72,8 @@ class Card:
                     Card.__ELEMENTS_MAP[element]
                     for element in data["Element"].split("/")
                 ],
-                name=data[f"Name_{language}"],
-                text=text,
+                name=data[f"Name{language.key_suffix}"],
+                text=load_text(language),
             )
 
     def __repr__(self) -> str:
