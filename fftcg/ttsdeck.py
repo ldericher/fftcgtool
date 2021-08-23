@@ -66,7 +66,8 @@ class TTSDeck(Cards):
             "Transform": {
                 "scaleX": 2.17822933,
                 "scaleY": 1.0,
-                "scaleZ": 2.17822933
+                "scaleZ": 2.17822933,
+                "rotY": 180.0,
             },
             "Locked": False,
             "Grid": True,
