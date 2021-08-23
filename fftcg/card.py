@@ -73,6 +73,9 @@ class Card:
                 text=text,
             )
 
+    def __repr__(self) -> str:
+        return f"Card(code={self.code!r}, name={self.name!r}, face_url={self.face_url!r})"
+
     def __str__(self) -> str:
         return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.code})"
 

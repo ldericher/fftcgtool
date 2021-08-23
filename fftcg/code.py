@@ -35,7 +35,7 @@ class Code:
         return f"{self.__opus}-{self.__serial}{self.__rarity}"
 
     def __repr__(self) -> str:
-        return f"Code(\"{str(self)}\")"
+        return f"Code({str(self)!r})"
 
     def __hash__(self) -> hash:
         return hash(self.short)
