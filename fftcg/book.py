@@ -19,11 +19,11 @@ class Book:
 
         # all card face URLs
         urls = [
-            f"https://fftcg.cdn.sewest.net/images/cards/full/{card.code}_{language.image_suffix}.jpg"
+            ("https://fftcg.cdn.sewest.net/images/cards/full/{}_{}.jpg", str(card.code), language.image_suffix)
             for card in cards
         ]
         # card back URL
-        urls.append(CARD_BACK_URL)
+        urls.append((CARD_BACK_URL, "", ""))
 
         # multi-threaded download
         images = ImageLoader.load(urls, num_threads)

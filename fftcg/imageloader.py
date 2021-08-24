@@ -1,33 +1,46 @@
-import io
 import logging
 import multiprocessing
 
 import requests
 from PIL import Image
 
+from .language import Language
 from .utils import RESOLUTION
+
+# constants
+FALLBACK_LANGUAGE = Language("en")
 
 
 class ImageLoader:
     @classmethod
-    def _load(cls, url: str) -> Image.Image:
+    def _load_inner(cls, url_parts: tuple[str, str, str]) -> Image.Image:
         logger = logging.getLogger(__name__)
+        base_url, code, lang_suffix = url_parts
+
+        # put together image url
+        url = base_url.format(code, lang_suffix)
+        logger.info(f"trying image {url}")
 
         # fetch image (retry on fail)
         while True:
-            logger.info(f"downloading image {url}")
             try:
-                res = requests.get(url)
-                image = Image.open(io.BytesIO(res.content))
+                res = requests.get(url, stream=True)
+                break
 
-                # unify images
-                image.convert(mode="RGB")
-                return image.resize(RESOLUTION, Image.BICUBIC)
-
-            except requests.exceptions.RequestException:
+            except requests.RequestException:
                 pass
 
+        # if rejected, substitute the english version
+        if not res.status_code == 200:
+            logger.warning(f"falling back to english version of {url}")
+            return cls._load_inner((base_url, code, FALLBACK_LANGUAGE.image_suffix))
+
+        # unify images
+        image = Image.open(res.raw)
+        image.convert(mode="RGB")
+        return image.resize(RESOLUTION, Image.BICUBIC)
+
     @classmethod
-    def load(cls, urls: list[str], num_threads: int) -> list[Image.Image]:
+    def load(cls, urls_parts: list[tuple[str, str, str]], num_threads: int) -> list[Image.Image]:
         with multiprocessing.Pool(num_threads) as p:
-            return p.map(ImageLoader._load, urls)
+            return p.map(cls._load_inner, urls_parts)

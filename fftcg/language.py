@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Language:
     def __init__(self, language: str):
         language = language.lower()
@@ -14,6 +17,12 @@ class Language:
 
     def __str__(self):
         return self.__short
+
+    def __hash__(self) -> hash:
+        return hash(str(self))
+
+    def __eq__(self, other: Language):
+        return str(self) == str(other)
 
     @property
     def image_suffix(self):
@@ -32,4 +41,3 @@ class Language:
             return ""
         else:
             return "_EN"
-

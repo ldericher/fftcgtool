@@ -10,7 +10,7 @@ from .ttsdeck import TTSDeck
 
 
 class Opus(Cards):
-    __SQUARE_API_URL = "https://fftcg.square-enix-games.com/de/get-cards"
+    __SQUARE_API_URL = "https://fftcg.square-enix-games.com/en/get-cards"
 
     def __init__(self, opus_id: str, language: Language):
         logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class Opus(Cards):
         self.sort(key=lambda x: x.code.opus)
 
         for card in self:
-            logger.info(f"imported card {card}")
+            logger.debug(f"imported card {card}")
 
     @property
     def number(self) -> str:

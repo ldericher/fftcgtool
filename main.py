@@ -48,6 +48,12 @@ def main() -> None:
     )
 
     parser.add_argument(
+        "-v", "--verbose",
+        help="increase output verbosity",
+        action="count",
+    )
+
+    parser.add_argument(
         "-l", "--language",
         type=fftcg.Language,
         default="en",
@@ -105,11 +111,24 @@ def main() -> None:
         help="the Deck to import",
     )
 
+    # parse arguments
+    args = parser.parse_args()
+
     # set up logging
+    if args.verbose is None:
+        args.verbose = logging.WARN
+    elif args.verbose == 1:
+        args.verbose = logging.INFO
+    else:
+        args.verbose = logging.DEBUG
+
     logging.basicConfig(
-        level=logging.INFO,
+        level=args.verbose,
         format="%(levelname)s: %(processName)s %(message)s",
     )
+
+    logger = logging.getLogger(__name__)
+    logger.debug(f"{args = }")
 
     # output directory
     if not os.path.exists(OUT_DIR_NAME):
@@ -118,13 +137,12 @@ def main() -> None:
     os.chdir(OUT_DIR_NAME)
 
     # call function based on args
-    args = parser.parse_args()
     for deck in args.func(args):
         deck.save()
 
     # bye
-    logging.info("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
-    logging.info("Thanks for using fftcgtool!")
+    print("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
+    print("Thanks for using fftcgtool!")
 
 
 if __name__ == "__main__":
