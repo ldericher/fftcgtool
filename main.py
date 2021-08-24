@@ -29,13 +29,17 @@ def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     return decks
 
 
-def ffdecks_deck(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
+def ffdecks_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     # load the current carddb
     carddb = fftcg.CardDB.get()
     carddb.load()
 
+    decks: list[fftcg.TTSDeck] = []
+    for deck_id in args.deck_ids:
+        decks.append(fftcg.TTSDeck.from_ffdecks_deck(deck_id))
+
     # import a deck
-    return [fftcg.TTSDeck.from_ffdecks_deck(args.deck_id)]
+    return decks
 
 
 def main() -> None:
@@ -101,14 +105,15 @@ def main() -> None:
     )
 
     deck_parser.set_defaults(
-        func=ffdecks_deck
+        func=ffdecks_decks
     )
 
     deck_parser.add_argument(
-        "deck_id",
+        "deck_ids",
         type=str,
+        nargs="+",
         metavar="Deck_ID",
-        help="the Deck to import",
+        help="the Decks to import",
     )
 
     # parse arguments
