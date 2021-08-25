@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from PIL import Image
-
-_Point = tuple[int, int]
-
 
 class Grid(tuple[int, int]):
     def __mul__(self, other: Grid) -> Grid:
@@ -21,16 +17,3 @@ class Grid(tuple[int, int]):
     def capacity(self):
         # capacity of grid (reserve last space for card back)
         return self.x * self.y - 1
-
-    def chunks(self, whole: list) -> list:
-        # while there are elements
-        while whole:
-            # get a chunk
-            yield whole[:self.capacity]
-            # remove that chunk
-            whole = whole[self.capacity:]
-
-    def paste(self, page: Image.Image, index: int, card: Image.Image) -> None:
-        w, h = card.size
-        position = (index % self.x) * w, (index // self.x) * h
-        page.paste(card, position)

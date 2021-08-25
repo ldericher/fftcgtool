@@ -1,60 +1,39 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass, InitVar, field
 
 
+@dataclass(frozen=True)
 class Code:
-    __RE_NUM = re.compile(r"([0-9]+)-([0-9]+)([CRHLS]?)")
-    __RE_PROMO = re.compile(r"(PR)-([0-9]+)")
-    __RE_BOSS = re.compile(r"(B)-([0-9]+)")
+    opus: str = field(init=False)
+    serial: int = field(init=False)
+    rarity: str = field(init=False, compare=False)
+    code_init: InitVar[str] = field(default="")
 
-    def __init__(self, code: str):
-        if code[0].isnumeric():
-            # card code starts with a number
-            self.__opus, self.__serial, self.__rarity = \
-                Code.__RE_NUM.match(code).groups()
+    __RE = re.compile(r"([1-9][0-9]*|PR|B)-([0-9]+)([CRHLS]?)", flags=re.UNICODE)
 
-        elif code.startswith("PR"):
-            # card code starts with "PR"
-            self.__opus, self.__serial = \
-                Code.__RE_PROMO.match(code).groups()
-            self.__rarity = ""
+    def __post_init__(self, code_init: str):
+        match = Code.__RE.match(code_init)
 
-        elif code.startswith("B"):
-            # card code starts with "B"
-            self.__opus, self.__serial = \
-                Code.__RE_BOSS.match(code).groups()
-            self.__rarity = ""
+        if match is not None:
+            groups = match.groups()
+            opus, serial, rarity = \
+                groups[0], int(groups[1]), groups[2]
 
         else:
             # card code not recognized
-            self.__opus, self.__serial, self.__rarity = \
-                "?", "???", "?"
+            opus, serial, rarity = \
+                "?", 0, "?"
 
-    def __str__(self) -> str:
-        return f"{self.__opus}-{self.__serial}{self.__rarity}"
-
-    def __repr__(self) -> str:
-        return f"Code({str(self)!r})"
-
-    def __hash__(self) -> hash:
-        return hash(self.short)
-
-    def __eq__(self, other: Code):
-        return self.short == other.short
+        object.__setattr__(self, "opus", opus)
+        object.__setattr__(self, "serial", serial)
+        object.__setattr__(self, "rarity", rarity)
 
     @property
     def short(self) -> str:
-        return f"{self.__opus}-{self.__serial}"
+        return f"{self.opus}-{self.serial:03}"
 
     @property
-    def opus(self) -> str:
-        return self.__opus
-
-    @property
-    def serial(self) -> int:
-        return int(self.__serial)
-
-    @property
-    def rarity(self) -> str:
-        return self.__rarity
+    def long(self) -> str:
+        return f"{self.short}{self.rarity}"

@@ -1,3 +1,5 @@
+from PIL import Image
+
 from .grid import Grid
 
 # constants
@@ -33,3 +35,18 @@ def encircle_symbol(symbol: str, negative: bool):
 
     symbol_num = ord(symbol) - ord(base_symbols[0])
     return chr(ord(base_symbols[1]) + symbol_num)
+
+
+def chunks(chunk_size: int, whole: list):
+    # while there are elements
+    while whole:
+        # get a chunk
+        yield whole[:chunk_size]
+        # remove that chunk
+        whole = whole[chunk_size:]
+
+
+def grid_paste(page: Image.Image, index: int, card: Image.Image) -> None:
+    w, h = card.size
+    position = (index % GRID.x) * w, (index // GRID.x) * h
+    page.paste(card, position)

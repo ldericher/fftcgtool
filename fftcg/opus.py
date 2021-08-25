@@ -17,17 +17,17 @@ class Opus(Cards):
 
         params: dict[str, any]
         if opus_id.isnumeric():
-            name = f"Opus {opus_id} ({language})"
+            name = f"Opus {opus_id} ({language.short})"
             self.__number = opus_id
             params = {"set": [f"Opus {roman.toRoman(int(opus_id)).upper()}"]}
 
         elif opus_id == "chaos":
-            name = f"Boss Deck Chaos ({language})"
+            name = f"Boss Deck Chaos ({language.short})"
             self.__number = "B"
             params = {"set": ["Boss Deck Chaos"]}
 
         elif opus_id == "promo":
-            name = f"Promo ({language})"
+            name = f"Promo ({language.short})"
             self.__number = "PR"
             params = {"rarity": ["pr"]}
 

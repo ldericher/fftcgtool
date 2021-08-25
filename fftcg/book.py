@@ -6,7 +6,7 @@ from PIL import Image
 from .cards import Cards
 from .imageloader import ImageLoader
 from .language import Language
-from .utils import GRID, RESOLUTION, CARD_BACK_URL, IMAGES_DIR_NAME
+from .utils import GRID, RESOLUTION, CARD_BACK_URL, IMAGES_DIR_NAME, chunks, grid_paste
 
 
 class Book:
@@ -19,7 +19,7 @@ class Book:
 
         # all card face URLs
         urls = [
-            ("https://fftcg.cdn.sewest.net/images/cards/full/{}_{}.jpg", str(card.code), language.image_suffix)
+            ("https://fftcg.cdn.sewest.net/images/cards/full/{}_{}.jpg", card.code.long, language.image_suffix)
             for card in cards
         ]
         # card back URL
@@ -32,17 +32,19 @@ class Book:
 
         self.__pages = []
 
-        for page_num, (page_images, page_cards) in enumerate(zip(GRID.chunks(images), GRID.chunks(cards))):
+        for page_num, (page_images, page_cards) in enumerate(zip(
+                chunks(GRID.capacity, images), chunks(GRID.capacity, cards)
+        )):
             # create book page Image
             page_image = Image.new("RGB", GRID * RESOLUTION)
             logger.info(f"New image: {page_image.size[0]}x{page_image.size[1]}")
 
             # paste card faces onto page
             for i, image in enumerate(page_images):
-                GRID.paste(page_image, i, image)
+                grid_paste(page_image, i, image)
 
             # paste card back in last position
-            GRID.paste(page_image, GRID.capacity, back_image)
+            grid_paste(page_image, GRID.capacity, back_image)
 
             # set card indices
             for i, card in enumerate(page_cards):
