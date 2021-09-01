@@ -10,19 +10,18 @@ OUT_DIR_NAME = "out"  # name of output directory
 
 
 def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
-    decks: list[fftcg.TTSDeck] = []
+    # load the current carddb
+    carddb = fftcg.CardDB()
+    carddb.load()
 
+    decks: list[fftcg.TTSDeck] = []
     for opus_id in args.opus_ids:
         # import an opus
         opus = fftcg.Opus(opus_id, args.language)
         book = fftcg.Book(opus, args.language, args.num_requests)
         book.save()
 
-        # load the current carddb
-        carddb = fftcg.CardDB.get()
-        carddb.load()
         carddb.update(opus)
-
         decks.extend(opus.elemental_decks)
 
     # create elemental decks for opus
@@ -31,7 +30,7 @@ def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
 
 def ffdecks_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
     # load the current carddb
-    carddb = fftcg.CardDB.get()
+    carddb = fftcg.CardDB()
     carddb.load()
 
     decks: list[fftcg.TTSDeck] = []

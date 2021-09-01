@@ -11,16 +11,14 @@ from .utils import CARDDB_FILE_NAME
 
 class CardDB:
     __instance: CardDB = None
+    __content: dict[Code, Card]
 
-    @classmethod
-    def get(cls) -> CardDB:
-        if not CardDB.__instance:
-            CardDB.__instance = CardDB()
+    def __new__(cls) -> CardDB:
+        if CardDB.__instance is None:
+            CardDB.__instance = object.__new__(cls)
+            CardDB.__instance.__content = {}
 
         return CardDB.__instance
-
-    def __init__(self):
-        self.__content: dict[Code, Card] = {}
 
     def __getitem__(self, code: Code) -> Card:
         return self.__content[code]

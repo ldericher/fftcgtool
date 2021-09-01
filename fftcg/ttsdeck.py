@@ -18,7 +18,7 @@ class TTSDeck(Cards):
         self.__description = description
 
         # get cards from carddb
-        carddb = CardDB.get()
+        carddb = CardDB()
         self.extend([
             carddb[code]
             for code in codes
