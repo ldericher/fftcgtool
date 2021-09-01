@@ -30,6 +30,9 @@ class Code:
         object.__setattr__(self, "serial", serial)
         object.__setattr__(self, "rarity", rarity)
 
+    def __str__(self) -> str:
+        return self.long
+
     @property
     def short(self) -> str:
         return f"{self.opus}-{self.serial:03}"

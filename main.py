@@ -143,7 +143,7 @@ def main() -> None:
 
     # call function based on args
     for deck in args.func(args):
-        deck.save()
+        deck.save(args.language)
 
     # bye
     print("Done. Put the generated JSON files in your 'Saved Objects' Folder.")

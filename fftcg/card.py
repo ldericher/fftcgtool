@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 
 from .code import Code
 from .language import Language
 from .utils import encircle_symbol
+
+
+@dataclass(frozen=True)
+class CardContent:
+    name: str
+    text: str
+    face: str
 
 
 class Card:
@@ -21,23 +29,19 @@ class Card:
         for elem_j, elem_e in zip(__ELEMENTS_JAP, __ELEMENTS_ENG)
     }
 
-    def __init__(self, code: Code, elements: list[str], name: str, text: str, face_url: str = "", index: int = 0):
-        self.__code = code
-        self.__elements = elements
-        self.__name = name
-        self.__text = text
-
-        self.__face_url = face_url
+    def __init__(self, code: Code, elements: list[str], content: dict[Language, CardContent], index: int = 0):
+        self.__code: Code = code
+        self.__elements: list[str] = elements
+        self.__content: dict[Language, CardContent] = content
         self.__index = index
 
     @classmethod
-    def from_square_api_data(cls, data: dict[str, any], language: Language) -> Card:
+    def from_square_api_data(cls, data: dict[str, any]) -> Card:
         if not data:
             return cls(
                 code=Code(""),
                 elements=[],
-                name="",
-                text="",
+                content={},
             )
 
         else:
@@ -69,21 +73,38 @@ class Card:
                 # place line breaks
                 return re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
 
+            content = {
+                language: CardContent(load_name(language), load_text(language), "")
+                for language in Language.all_api_langs()
+            }
+
             return cls(
                 code=Code(data["Code"]),
                 elements=[
                     Card.__ELEMENTS_MAP[element]
                     for element in data["Element"].split("/")
                 ],
-                name=load_name(language),
-                text=load_text(language),
+                content=content,
             )
 
     def __repr__(self) -> str:
-        return f"Card(code={self.code!r}, name={self.name!r}, face_url={self.face_url!r})"
+        return f"Card(code={self.code!r}, content={self.__content!r})"
 
     def __str__(self) -> str:
-        return f"'{self.__name}' ({'/'.join(self.__elements)}, {self.code})"
+        if self.__content:
+            return f"'{self[''].name}' ({'/'.join(self.__elements)}, {self.code})"
+
+    def __getitem__(self, item: Language | str) -> CardContent:
+        if isinstance(item, Language):
+            return self.__content[item]
+        else:
+            return self.__content[Language(item)]
+
+    def __setitem__(self, key: Language | str, value: CardContent) -> None:
+        if isinstance(key, Language):
+            self.__content[key] = value
+        else:
+            self.__content[Language(key)] = value
 
     # 6-048C
     @property
@@ -91,24 +112,8 @@ class Card:
         return self.__code
 
     @property
-    def name(self) -> str:
-        return self.__name
-
-    @property
-    def text(self) -> str:
-        return self.__text
-
-    @property
     def elements(self) -> list[str]:
         return self.__elements
-
-    @property
-    def face_url(self) -> str:
-        return self.__face_url
-
-    @face_url.setter
-    def face_url(self, face_url: str) -> None:
-        self.__face_url = face_url
 
     @property
     def index(self) -> int:

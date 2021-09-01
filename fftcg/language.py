@@ -35,3 +35,10 @@ class Language:
             return ""
         else:
             return "_EN"
+
+    @classmethod
+    def all_api_langs(cls) -> set[Language]:
+        return set([
+            cls(short)
+            for short in ["de", "en", "es", "fr", "it", "ja"]
+        ])

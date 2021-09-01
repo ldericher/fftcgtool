@@ -49,15 +49,17 @@ class Opus(Cards):
 
         # get cards from square api
         req = requests.post(Opus.__SQUARE_API_URL, json=params)
-        super().__init__(name, [
-            Card.from_square_api_data(card_data, language)
+        cards = [
+            Card.from_square_api_data(card_data)
             for card_data in req.json()["cards"]
-        ])
+        ]
 
         # remove reprints
-        for card in self:
-            if not card.code.opus == self.__number:
-                self.remove(card)
+        super().__init__(name, [
+            card
+            for card in cards
+            if card.code.opus == self.__number
+        ])
 
         # sort cards by opus, then serial
         self.sort(key=lambda x: x.code.serial)

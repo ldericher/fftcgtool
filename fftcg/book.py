@@ -1,5 +1,6 @@
 import logging
 import os
+from dataclasses import replace
 
 from PIL import Image
 
@@ -14,8 +15,8 @@ class Book:
         logger = logging.getLogger(__name__)
 
         # sort cards by element, then alphabetically
-        cards.sort(key=lambda x: x.name)
-        cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
+        # cards.sort(key=lambda x: x[""].name)
+        # cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
 
         # all card face URLs
         urls = [
@@ -35,6 +36,8 @@ class Book:
         for page_num, (page_images, page_cards) in enumerate(zip(
                 chunks(GRID.capacity, images), chunks(GRID.capacity, cards)
         )):
+            file_name = f"{cards.file_name}_{page_num}.jpg"
+
             # create book page Image
             page_image = Image.new("RGB", GRID * RESOLUTION)
             logger.info(f"New image: {page_image.size[0]}x{page_image.size[1]}")
@@ -49,10 +52,11 @@ class Book:
             # set card indices
             for i, card in enumerate(page_cards):
                 card.index = i
+                card[language] = replace(card[language], face=file_name)
 
             # save page
             self.__pages.append({
-                "file_name": f"{cards.file_name}_{page_num}.jpg",
+                "file_name": file_name,
                 "image": page_image,
                 "cards": page_cards,
             })
@@ -65,13 +69,3 @@ class Book:
         for page in self.__pages:
             page["file_name"] = os.path.join(IMAGES_DIR_NAME, page["file_name"])
             page["image"].save(page["file_name"])
-
-        # ask for upload
-        for page in self.__pages:
-            face_url = input(f"Upload '{page['file_name']}' and paste URL: ")
-
-            if not face_url:
-                face_url = f"file://{os.path.abspath(page['file_name'])}"
-
-            for card in page["cards"]:
-                card.face_url = face_url
