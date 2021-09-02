@@ -89,7 +89,7 @@ class Opus(Cards):
                     for card in self
                 ],
                 f"{self.name}",
-                f"All {self.name} Cards in elemental, then alphabetical order"
+                f"All {self.name} Cards"
             )]
 
         else:
@@ -110,10 +110,15 @@ class Opus(Cards):
                 "Multi": lambda card: len(card.elements) > 1,
             }
 
+            # sort cards by element, then alphabetically
+            cards = list(self)
+            cards.sort(key=lambda x: x[self.__language].name)
+            cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
+
             return [TTSDeck(
                 [
                     card.code
-                    for card in self
+                    for card in cards
                     if f(card)
                 ],
                 f"{self.name} {elem}",

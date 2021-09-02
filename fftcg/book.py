@@ -14,10 +14,6 @@ class Book:
     def __init__(self, cards: Cards, language: Language, num_threads: int):
         logger = logging.getLogger(__name__)
 
-        # sort cards by element, then alphabetically
-        # cards.sort(key=lambda x: x[""].name)
-        # cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
-
         # all card face URLs
         urls = [
             ("https://fftcg.cdn.sewest.net/images/cards/full/{}_{}.jpg", card.code.long, language.image_suffix)
