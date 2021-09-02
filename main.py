@@ -24,6 +24,8 @@ def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
         carddb.update(opus)
         decks.extend(opus.elemental_decks)
 
+    carddb.upload_prompt()
+
     # create elemental decks for opus
     return decks
 
