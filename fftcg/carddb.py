@@ -41,6 +41,12 @@ class CardDB:
 
         self.__pickle()
 
+    def get_face_url(self, face: str) -> str:
+        if face in self.__face_to_url:
+            return self.__face_to_url[face]
+        else:
+            return face
+
     def upload_prompt(self) -> None:
         faces = list(set([
             card[lang].face

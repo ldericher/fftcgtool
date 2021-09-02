@@ -39,6 +39,8 @@ class TTSDeck(Cards):
         return cls(codes, name, description)
 
     def tts_object(self, language: Language) -> dict[str, any]:
+        carddb = CardDB()
+
         # unique face urls used
         unique_faces = set([
             card[language].face
@@ -46,7 +48,7 @@ class TTSDeck(Cards):
         ])
 
         # lookup for indices of urls
-        url_indices = {
+        face_indices = {
             url: i + 1
             for i, url in enumerate(unique_faces)
         }
@@ -56,9 +58,9 @@ class TTSDeck(Cards):
             str(i): {
                 "NumWidth": "10",
                 "NumHeight": "7",
-                "FaceURL": url,
+                "FaceURL": carddb.get_face_url(face),
                 "BackURL": CARD_BACK_URL,
-            } for url, i in url_indices.items()
+            } for face, i in face_indices.items()
         }
 
         # values both in main deck and each contained card
@@ -83,7 +85,7 @@ class TTSDeck(Cards):
             {
                 "Nickname": card[language].name,
                 "Description": card[language].text,
-                "CardID": 100 * url_indices[card[language].face] + card.index,
+                "CardID": 100 * face_indices[card[language].face] + card.index,
 
                 "Name": "Card",
                 "Hands": True,
