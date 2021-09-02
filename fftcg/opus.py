@@ -1,11 +1,13 @@
 import logging
+from dataclasses import replace
 
 import requests
 import roman
 
 from .card import Card
+from .carddb import CardDB
 from .cards import Cards
-from .language import Language
+from .language import Language, API_LANGS
 from .ttsdeck import TTSDeck
 
 
@@ -14,20 +16,21 @@ class Opus(Cards):
 
     def __init__(self, opus_id: str, language: Language):
         logger = logging.getLogger(__name__)
+        self.__language = language
 
         params: dict[str, any]
         if opus_id.isnumeric():
-            name = f"Opus {opus_id} ({language.short})"
+            name = f"Opus {opus_id} ({self.__language.short})"
             self.__number = opus_id
             params = {"set": [f"Opus {roman.toRoman(int(opus_id)).upper()}"]}
 
         elif opus_id == "chaos":
-            name = f"Boss Deck Chaos ({language.short})"
+            name = f"Boss Deck Chaos ({self.__language.short})"
             self.__number = "B"
             params = {"set": ["Boss Deck Chaos"]}
 
         elif opus_id == "promo":
-            name = f"Promo ({language.short})"
+            name = f"Promo ({self.__language.short})"
             self.__number = "PR"
             params = {"rarity": ["pr"]}
 
@@ -49,6 +52,7 @@ class Opus(Cards):
 
         # get cards from square api
         req = requests.post(Opus.__SQUARE_API_URL, json=params)
+        carddb = CardDB()
         cards = [
             Card.from_square_api_data(card_data)
             for card_data in req.json()["cards"]
@@ -66,6 +70,10 @@ class Opus(Cards):
         self.sort(key=lambda x: x.code.opus)
 
         for card in self:
+            if card.code in carddb:
+                for lang in API_LANGS:
+                    card[lang] = replace(card[lang], face=carddb[card.code][lang].face)
+
             logger.debug(f"imported card {card}")
 
     @property

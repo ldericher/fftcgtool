@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 
 from .code import Code
-from .language import Language
+from .language import Language, API_LANGS
 from .utils import encircle_symbol
 
 
@@ -75,7 +75,7 @@ class Card:
 
             content = {
                 language: CardContent(load_name(language), load_text(language), "")
-                for language in Language.all_api_langs()
+                for language in API_LANGS
             }
 
             return cls(

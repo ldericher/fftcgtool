@@ -20,6 +20,9 @@ class CardDB:
 
         return CardDB.__instance
 
+    def __contains__(self, item: Code) -> bool:
+        return item in self.__content
+
     def __getitem__(self, code: Code) -> Card:
         return self.__content[code]
 

@@ -36,9 +36,13 @@ class Language:
         else:
             return "_EN"
 
-    @classmethod
-    def all_api_langs(cls) -> set[Language]:
-        return set([
-            cls(short)
-            for short in ["de", "en", "es", "fr", "it", "ja"]
-        ])
+
+API_LANGS = frozenset([
+    Language(short)
+    for short in ["de", "en", "es", "fr", "it", "ja"]
+])
+
+IMG_LANGS = frozenset([
+    Language(short)
+    for short in ["de", "en", "es", "fr", "it"]
+])
