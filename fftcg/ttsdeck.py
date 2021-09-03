@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import re
 
 import requests
 
@@ -14,23 +16,57 @@ from .utils import CARD_BACK_URL, DECKS_DIR_NAME
 
 class TTSDeck(Cards):
     def __init__(self, codes: list[Code], name: str, description: str, face_down: bool):
+        logger = logging.getLogger(__name__)
         super().__init__(name)
         self.__description = description
         self.__face_down = face_down
 
         # get cards from carddb
         carddb = CardDB()
+
+        # non-imported cards
+        codes_invalid = frozenset([
+            code
+            for code in codes
+            if code not in carddb
+        ])
+
+        # show errors and remove non-imported cards
+        for code in codes_invalid:
+            logger.error(f"Code '{code}' not in CardDB, ignoring!")
+            while code in codes:
+                codes.remove(code)
+
+        # put existing cards into deck
         self.extend([
             carddb[code]
             for code in codes
         ])
 
     __FFDECKS_API_URL = "https://ffdecks.com/api/deck"
+    __RE_FFDECKS_ID = re.compile(r"((https?://)?ffdecks\.com(/+api)?/+deck/+)?([0-9]+).*", flags=re.UNICODE)
 
     @classmethod
     def from_ffdecks_deck(cls, deck_id: str) -> TTSDeck:
+        logger = logging.getLogger(__name__)
+
+        # check deck id
+        match = TTSDeck.__RE_FFDECKS_ID.match(deck_id)
+
+        if match is None:
+            logger.error("Malformed Deck ID for FFDecks API!")
+            return cls([], "", "", True)
+
+        else:
+            # extract deck id from match
+            deck_id = match.groups()[3]
+
         # api request
         req = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
+
+        if req.status_code != 200:
+            logger.error("Invalid Deck ID for FFDecks API!")
+            return cls([], "", "", True)
 
         # pre-extract the used data
         deck_cards = [{
