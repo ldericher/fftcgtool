@@ -11,8 +11,11 @@ class Cards(list[Card]):
         super().__init__(cards)
         self.__name = name
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return f"[{', '.join(str(card) for card in self)}]"
+
+    def __str__(self) -> str:
+        return repr(self)
 
     @property
     def name(self) -> str:

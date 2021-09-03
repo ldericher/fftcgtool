@@ -41,7 +41,7 @@ class Opus(Cards):
             self.__filename = "?"
             params = {"set": "?"}
 
-        logger.info(f"Importing Opus {self.__number}")
+        logger.info(f"Importing {name}")
 
         # required params:
         #  text
