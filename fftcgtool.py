@@ -62,8 +62,8 @@ def main() -> None:
         "-l", "--language",
         type=fftcg.Language,
         default="en",
-        metavar="LANGUAGE",
-        help="lang",
+        metavar="LANG",
+        help="language for imported objects",
     )
 
     subparsers = parser.add_subparsers(
@@ -74,16 +74,16 @@ def main() -> None:
     )
 
     # "opus" subcommand
-    opus_parser = subparsers.add_parser(
-        "opus",
-        description="Imports an Opus from the square API and creates its elemental decks as JSON files.",
+    opuses_parser = subparsers.add_parser(
+        "opuses",
+        description="Imports Opuses from the square API and creates its elemental decks as JSON files.",
     )
 
-    opus_parser.set_defaults(
+    opuses_parser.set_defaults(
         func=opus_decks
     )
 
-    opus_parser.add_argument(
+    opuses_parser.add_argument(
         "opus_ids",
         type=str,
         nargs="+",
@@ -91,7 +91,7 @@ def main() -> None:
         help="the Opuses to import",
     )
 
-    opus_parser.add_argument(
+    opuses_parser.add_argument(
         "-n", "--num_requests",
         type=int,
         default=20,
@@ -99,17 +99,17 @@ def main() -> None:
         help="maximum number of concurrent requests",
     )
 
-    # "deck" subcommand
-    deck_parser = subparsers.add_parser(
-        "deck",
-        description="Imports a Deck from the ffdecks.com API and creates it as a JSON file.",
+    # "ffdecks" subcommand
+    ffdecks_parser = subparsers.add_parser(
+        "ffdecks",
+        description="Imports Decks from the ffdecks.com API and creates it as a JSON file.",
     )
 
-    deck_parser.set_defaults(
+    ffdecks_parser.set_defaults(
         func=ffdecks_decks
     )
 
-    deck_parser.add_argument(
+    ffdecks_parser.add_argument(
         "deck_ids",
         type=str,
         nargs="+",

@@ -29,4 +29,4 @@ RUN set -ex; \
 
 COPY . .
 
-ENTRYPOINT ["pipenv", "run", "./main.py"]
+ENTRYPOINT ["pipenv", "run", "./fftcgtool.py"]
