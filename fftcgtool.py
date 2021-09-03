@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import io
 import logging
 import os
 import sys
@@ -156,19 +155,15 @@ def main() -> None:
 
     # decide what to do with the decks
     if args.stdout:
-        # create file-like buffer
-        with io.BytesIO() as buffer:
-            # create zip file in buffer
-            with zipfile.ZipFile(buffer, "w") as zip_file:
+        # print out a zip file
+        with open(sys.stdout.fileno(), "wb", closefd=False, buffering=0) as raw_stdout:
+            with zipfile.ZipFile(raw_stdout, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+                # put the decks into that zip file
                 for deck in decks:
                     zip_file.writestr(deck.file_name, deck.get_json(args.language))
 
-            # write buffer to stdout
-            buffer.seek(0)
-            with open(sys.stdout.fileno(), "wb", closefd=False, buffering=0) as stdout:
-                stdout.write(buffer.read())
-
     else:
+        # save the decks to disk
         for deck in decks:
             deck.save(args.language)
 
