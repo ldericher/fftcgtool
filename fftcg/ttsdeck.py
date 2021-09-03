@@ -72,6 +72,8 @@ class TTSDeck(Cards):
             logger.error("Invalid Deck ID for FFDecks API!")
             return cls([], "", "", True)
 
+        logger.info(f"Importing Deck {deck_id}")
+
         # pre-extract the used data
         deck_cards = [{
             "code": card["card"]["serial_number"],

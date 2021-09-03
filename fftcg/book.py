@@ -20,12 +20,12 @@ class Book:
             for card in cards
         ]
         # card back URL
-        urls.append((CARD_BACK_URL, "", ""))
+        urls.insert(0, (CARD_BACK_URL, "", ""))
 
         # multi-threaded download
-        images = ImageLoader.load(urls, num_threads)
+        images = iter(ImageLoader.load(urls, num_threads))
         # card back Image
-        back_image = images.pop(-1)
+        back_image = next(images)
 
         self.__pages = []
 
@@ -63,5 +63,6 @@ class Book:
 
         # save images
         for page in self.__pages:
-            page["file_name"] = os.path.join(IMAGES_DIR_NAME, page["file_name"])
-            page["image"].save(page["file_name"])
+            page["image"].save(
+                os.path.join(IMAGES_DIR_NAME, page["file_name"])
+            )

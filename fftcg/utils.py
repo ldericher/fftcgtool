@@ -1,4 +1,5 @@
-from typing import Iterator
+import itertools
+from typing import Iterator, Generator, Iterable
 
 from PIL import Image
 
@@ -39,13 +40,17 @@ def encircle_symbol(symbol: str, negative: bool) -> str:
     return chr(ord(base_symbols[1]) + symbol_num)
 
 
-def chunks(chunk_size: int, whole: list) -> Iterator[list]:
-    # while there are elements
-    while whole:
-        # get a chunk
-        yield whole[:chunk_size]
-        # remove that chunk
-        whole = whole[chunk_size:]
+def chunks(chunk_size: int, whole: Iterable) -> Generator[Iterator, None, None]:
+    it = iter(whole)
+    # get chunk
+    while chunk := itertools.islice(it, chunk_size):
+        # stop if no first element was found
+        try:
+            first_el = next(chunk)
+        except StopIteration:
+            return
+        # reattach first element
+        yield itertools.chain((first_el,), chunk)
 
 
 def grid_paste(page: Image.Image, index: int, card: Image.Image) -> None:

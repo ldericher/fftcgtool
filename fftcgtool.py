@@ -12,10 +12,7 @@ OUT_DIR_NAME = "out"  # name of output directory
 
 
 def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
-    # load the current carddb
     carddb = fftcg.CardDB()
-    carddb.load()
-
     decks: list[fftcg.TTSDeck] = []
     for opus_id in args.opus_ids:
         # import an opus
@@ -33,15 +30,11 @@ def opus_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
 
 
 def ffdecks_decks(args: argparse.Namespace) -> list[fftcg.TTSDeck]:
-    # load the current carddb
-    carddb = fftcg.CardDB()
-    carddb.load()
-
     decks: list[fftcg.TTSDeck] = []
     for deck_id in args.deck_ids:
+        # import a deck
         decks.append(fftcg.TTSDeck.from_ffdecks_deck(deck_id))
 
-    # import a deck
     return decks
 
 
@@ -142,6 +135,7 @@ def main() -> None:
     )
 
     logger = logging.getLogger(__name__)
+    logger.info("fftcgtool started.")
     logger.debug(f"{args = }")
 
     # output directory
@@ -149,6 +143,10 @@ def main() -> None:
         os.mkdir(OUT_DIR_NAME)
 
     os.chdir(OUT_DIR_NAME)
+
+    # load the current carddb
+    carddb = fftcg.CardDB()
+    carddb.load()
 
     # call function based on args
     decks = args.func(args)

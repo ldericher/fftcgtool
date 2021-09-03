@@ -1,6 +1,6 @@
 import logging
 from dataclasses import replace
-from typing import Callable, Iterator
+from typing import Callable, Iterable
 
 import requests
 import roman
@@ -40,6 +40,8 @@ class Opus(Cards):
             self.__number = "?"
             self.__filename = "?"
             params = {"set": "?"}
+
+        logger.info(f"Importing Opus {self.__number}")
 
         # required params:
         #  text
@@ -82,7 +84,7 @@ class Opus(Cards):
         return self.__number
 
     @property
-    def elemental_decks(self) -> Iterator[TTSDeck]:
+    def elemental_decks(self) -> Iterable[TTSDeck]:
         if self.number in ["PR", "B"]:
             return [TTSDeck(
                 codes=[
