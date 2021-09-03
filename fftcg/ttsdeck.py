@@ -68,7 +68,7 @@ class TTSDeck(Cards):
             "PR-055": "11-062",
         }
 
-        # replace with non
+        # replace with normal-art cards
         for card in deck_cards:
             if card["code"] in replace_full_arts:
                 card["code"] = replace_full_arts[card["code"]]
