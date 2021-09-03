@@ -6,21 +6,20 @@ for the [Tabletop Simulator](http://berserk-games.com/tabletop-simulator/)
 ## Usage
 
 ```
-usage: fftcgtool [-h] [-v] [-l LANG] [-s] {opuses,ffdecks} ...
+Usage: fftcgtool.py [OPTIONS] COMMAND [ARGS]...
 
-Imports FFTCG cards for TT-Sim.
+  Imports FFTCG cards for TT-Sim.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -v, --verbose         increase output verbosity
-  -l LANG, --language LANG
-                        language for imported objects
-  -s, --stdout          print the deck files in a zip archive to stdout, skip creating JSONs on disk
+Options:
+  -v, --verbose        increase output verbosity  [x>=0]
+  -l, --language LANG  language for imported objects
+  -s, --stdout         print the deck files in a zip archive to stdout, skip
+                       creating JSONs on disk
+  --help               Show this message and exit.
 
-subcommands:
-  Import either an Opus to extend the mod, or import a deck to play right away.
-
-  {opuses,ffdecks}      valid subcommands
+Commands:
+  ffdecks  Imports Decks from the ffdecks.com API and creates it as a...
+  opuses   Imports Opuses from the square API and creates its elemental...
 ```
 
 ## Examples
