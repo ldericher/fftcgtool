@@ -1,5 +1,6 @@
 import logging
 from dataclasses import replace
+from typing import Callable, Iterator
 
 import requests
 import roman
@@ -81,7 +82,7 @@ class Opus(Cards):
         return self.__number
 
     @property
-    def elemental_decks(self) -> list[TTSDeck]:
+    def elemental_decks(self) -> Iterator[TTSDeck]:
         if self.number in ["PR", "B"]:
             return [TTSDeck(
                 codes=[
@@ -94,7 +95,7 @@ class Opus(Cards):
             )]
 
         else:
-            def element_filter(element: str):
+            def element_filter(element: str) -> Callable[[Card], list[str]]:
                 return lambda card: card.elements == [element]
 
             # simple cases: create lambdas for base elemental decks
@@ -116,13 +117,23 @@ class Opus(Cards):
             cards.sort(key=lambda x: x[self.__language].name)
             cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
 
-            return [TTSDeck(
-                codes=[
-                    card.code
-                    for card in cards
-                    if f(card)
-                ],
-                name=f"{self.name} {elem}",
-                description=f"All {self.name} Cards with {elem} element in alphabetical order",
-                face_down=False,
-            ) for elem, f in filters.items()]
+            # generate decks
+            decks = (
+                TTSDeck(
+                    codes=[
+                        card.code
+                        for card in cards
+                        if f(card)
+                    ],
+                    name=f"{self.name} {elem}",
+                    description=f"All {self.name} Cards with {elem} element in alphabetical order",
+                    face_down=False,
+                ) for elem, f in filters.items()
+            )
+
+            # Ignore empty decks
+            return (
+                deck
+                for deck in decks
+                if deck
+            )

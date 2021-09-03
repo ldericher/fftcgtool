@@ -19,7 +19,7 @@ class Language:
             object.__setattr__(self, "short", "en")
 
     @property
-    def image_suffix(self):
+    def image_suffix(self) -> str:
         # supported languages for face URLs
         if self.short in ["de", "es", "fr", "it"]:
             return self.short
@@ -27,7 +27,7 @@ class Language:
             return "eg"
 
     @property
-    def key_suffix(self):
+    def key_suffix(self) -> str:
         # supported languages for Square API
         if self.short in ["de", "es", "fr", "it"]:
             return f"_{self.short.upper()}"

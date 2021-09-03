@@ -1,3 +1,5 @@
+from typing import Iterator
+
 from PIL import Image
 
 from .grid import Grid
@@ -13,7 +15,7 @@ CARD_BACK_URL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/8506
 
 
 # functions
-def encircle_symbol(symbol: str, negative: bool):
+def encircle_symbol(symbol: str, negative: bool) -> str:
     symbol = symbol[0].upper()
 
     base_symbols: tuple[str, str] = "", ""
@@ -37,7 +39,7 @@ def encircle_symbol(symbol: str, negative: bool):
     return chr(ord(base_symbols[1]) + symbol_num)
 
 
-def chunks(chunk_size: int, whole: list):
+def chunks(chunk_size: int, whole: list) -> Iterator[list]:
     # while there are elements
     while whole:
         # get a chunk

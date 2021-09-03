@@ -6,14 +6,14 @@ class Grid(tuple[int, int]):
         return Grid((self.x * other.x, self.y * other.y))
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self[0]
 
     @property
-    def y(self):
+    def y(self) -> int:
         return self[1]
 
     @property
-    def capacity(self):
+    def capacity(self) -> int:
         # capacity of grid (reserve last space for card back)
         return self.x * self.y - 1

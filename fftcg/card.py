@@ -45,10 +45,10 @@ class Card:
             )
 
         else:
-            def sub_encircle(match: re.Match):
+            def sub_encircle(match: re.Match) -> str:
                 return encircle_symbol(match.group(1), False)
 
-            def sub_elements(match: re.Match):
+            def sub_elements(match: re.Match) -> str:
                 return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], False)
 
             def load_name(language: Language) -> str:
