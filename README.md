@@ -6,17 +6,21 @@ Card import tool for [Final Fantasy TCG Complete](https://steamcommunity.com/sha
 ## Usage
 
 ```
-usage: fftcgtool [-h] {opus,deck} ...
+usage: fftcgtool [-h] [-v] [-l LANG] [-s] {opuses,ffdecks} ...
 
 Imports FFTCG cards for TT-Sim.
 
 optional arguments:
-  -h, --help   show this help message and exit
+  -h, --help            show this help message and exit
+  -v, --verbose         increase output verbosity
+  -l LANG, --language LANG
+                        language for imported objects
+  -s, --stdout          print the deck files in a zip archive to stdout, skip creating JSONs on disk
 
 subcommands:
   Import either an Opus to extend the mod, or import a deck to play right away.
 
-  {opus,deck}  valid subcommands
+  {opuses,ffdecks}      valid subcommands
 ```
 
 ### Run using your system's `python3`
@@ -36,9 +40,11 @@ subcommands:
 > All generated files will thus be owned by `root:root` by default.
 
 1. Make sure you have a working installation of `docker` software.
-2. Update your local image .
+2. Update your local image
    - Either use `docker pull ldericher/fftcgtool`
-   - Or run `docker build --pull --tag ldericher/fftcgtool .`
+   - Or build it yourself
+      1. Clone this repository
+      2. Inside this directory, run `docker build --pull --tag ldericher/fftcgtool .`
 3. Run `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool` in any directory.
 4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool'`
    to define `fftcgtool` shorthand for your running shell.
