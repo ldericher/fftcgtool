@@ -43,6 +43,10 @@ class TTSDeck(Cards):
             for code in codes
         ])
 
+    @property
+    def file_name(self) -> str:
+        return f"{super().file_name}.json"
+
     __FFDECKS_API_URL = "https://ffdecks.com/api/deck"
     __RE_FFDECKS_ID = re.compile(r"((https?://)?ffdecks\.com(/+api)?/+deck/+)?([0-9]+).*", flags=re.UNICODE)
 
@@ -125,7 +129,7 @@ class TTSDeck(Cards):
         # create deck object
         return cls(codes, name, description, True)
 
-    def tts_object(self, language: Language) -> dict[str, any]:
+    def get_tts_object(self, language: Language) -> dict[str, any]:
         carddb = CardDB()
 
         # unique face urls used
@@ -207,11 +211,14 @@ class TTSDeck(Cards):
 
         return deck_dict
 
+    def get_json(self, language: Language) -> str:
+        return json.dumps(self.get_tts_object(language), indent=2)
+
     def save(self, language: Language) -> None:
         # only save if the deck contains cards
         if self:
             if not os.path.exists(DECKS_DIR_NAME):
                 os.mkdir(DECKS_DIR_NAME)
 
-            with open(os.path.join(DECKS_DIR_NAME, f"{self.file_name}.json"), "w") as file:
-                json.dump(self.tts_object(language), file, indent=2)
+            with open(os.path.join(DECKS_DIR_NAME, self.file_name), "w") as file:
+                file.write(self.get_json(language))

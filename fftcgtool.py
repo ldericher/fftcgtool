@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import io
 import logging
 import os
+import sys
+import zipfile
 
 import fftcg
 
@@ -64,6 +67,12 @@ def main() -> None:
         default="en",
         metavar="LANG",
         help="language for imported objects",
+    )
+
+    parser.add_argument(
+        "-s", "--stdout",
+        action="store_true",
+        help="print the deck files in a zip archive to stdout, skip creating JSONs on disk",
     )
 
     subparsers = parser.add_subparsers(
@@ -143,12 +152,29 @@ def main() -> None:
     os.chdir(OUT_DIR_NAME)
 
     # call function based on args
-    for deck in args.func(args):
-        deck.save(args.language)
+    decks = args.func(args)
 
-    # bye
-    print("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
-    print("Thanks for using fftcgtool!")
+    # decide what to do with the decks
+    if args.stdout:
+        # create file-like buffer
+        with io.BytesIO() as buffer:
+            # create zip file in buffer
+            with zipfile.ZipFile(buffer, "w") as zip_file:
+                for deck in decks:
+                    zip_file.writestr(deck.file_name, deck.get_json(args.language))
+
+            # write zip file to stdout
+            buffer.seek(0)
+            with open(sys.stdout.fileno(), "wb", closefd=False, buffering=0) as stdout:
+                stdout.write(buffer.read())
+
+    else:
+        for deck in decks:
+            deck.save(args.language)
+
+        # bye
+        print("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
+        print("Thanks for using fftcgtool!")
 
 
 if __name__ == "__main__":
