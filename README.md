@@ -1,7 +1,7 @@
 # fftcgtool
 
-Card import tool for [Final Fantasy TCG Complete](https://steamcommunity.com/sharedfiles/filedetails/?id=889160751) mod for the [Tabletop Simulator](http://berserk-games.com/tabletop-simulator/)
-
+Card import tool for [Final Fantasy TCG Complete](https://steamcommunity.com/sharedfiles/filedetails/?id=889160751) mod
+for the [Tabletop Simulator](http://berserk-games.com/tabletop-simulator/)
 
 ## Usage
 
@@ -23,21 +23,78 @@ subcommands:
   {opuses,ffdecks}      valid subcommands
 ```
 
-### Run using your system's `python3`
+## Examples
 
-1. Make sure you have at least python version `3.9` installed. 
-   To test, run `python --version` or similar. 
-   Also, `pipenv` should be installed for that python version.
-   Refer to [pipenv installation guide](https://pipenv.pypa.io/en/latest/install/) if needed.
+### Import Opuses
+
+```sh
+fftcgtool opuses 14
+```
+
+Import Opus XIV.
+
+Card face images are saved to the `out/images/` subdirectory.
+
+For each of the six base elements, an "elemental deck" is saved to the `out/decks/` subdirectory. An elemental deck
+contains all cards of that element. Light and Darkness element cards is contained in a combined elemental deck.
+Multi-element cards are contained in another combined elemental deck.
+
+Additionally, the card database zip is saved to the `out/` subdirectory. It contains all card data imported so far.
+
+Finally, you will be asked to upload each card face image and provide a link.
+
+Non-existent subdirectories will be created.
+
+```sh
+fftcgtool opuses --help
+```
+
+Show more info about the `opuses` subcommand.
+
+```sh
+fftcgtool opuses -n 11 chaos 4 8 13
+```
+
+Import the "Boss Deck Chaos" and the Opuses IV, VIII and XIII using 11 parallel processes.
+
+For small Opuses like the Boss Cards, only a single deck is saved to the `out/decks/` subdirectory.
+
+### Import decks from ffdecks.com
+
+```sh
+fftcgtool ffdecks 6272690272862208
+# or
+fftcgtool ffdecks 'https://ffdecks.com/deck/6272690272862208'
+```
+
+Import the deck [WOL Mono Fire🔥](https://ffdecks.com/deck/6272690272862208) from ffdecks.com.
+
+You will need a card database zip with all needed cards for this to work. Cards not found in the zip will be omitted.
+
+The imported deck will be saved to the `out/decks/` subdirectory. It will be created if it doesn't exist.
+
+```sh
+fftcgtool ffdecks --help
+```
+
+Show more info about the `ffdecks` subcommand.
+
+## Installation
+
+### Using your system's `python3`
+
+1. Make sure you have at least python version `3.9` installed. To test, run `python --version` or similar.
+   Also, `pipenv` should be installed for that python version. Refer
+   to [pipenv installation guide](https://pipenv.pypa.io/en/latest/install/) if needed.
 2. To install `fftcgtool` dependencies, run `pipenv install --deploy` from project root directory.
 3. Run `pipenv run ./fftcgtool.py` from project root directory.
 4. You can `alias fftcgtool='PIPENV_PIPFILE="'$(pwd)'/Pipfile" pipenv run "'$(pwd)'/fftcgtool.py"'` from project root
    directory to define `fftcgtool` shorthand for your running shell.
 
-### Run using a `docker` container
+### Using a `docker` container
 
 > Caveat: This simplistic container runs `fftcgtool` as root user.
-> All generated files will thus be owned by `root:root` by default.
+> Directly generated files will thus be owned by `root:root` by default.
 
 1. Make sure you have a working installation of `docker` software.
 2. Update your local image.
@@ -47,9 +104,12 @@ subcommands:
 4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool'`
    to define `fftcgtool` shorthand for your running shell.
 
-Output files will go to subdirectory `./out`. CLI arguments are supported as `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool -n 2 5` (imports Opus 5 using 2 threads)
+Output files will go to subdirectory `./out`. CLI arguments are supported
+as `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool -n 2 5` (imports Opus 5 using 2 threads)
 
+## To-Do-List
 
-## Future work
-
-- Multiple opus import
+- `deck` subcommand, which would read a custom deck list in text format
+- `db` CLI parameter, which card db zip to use, also load zip from URL
+- `rw` CLI parameter, enable writing to db zip file (incompatible with zip URL)
+- `stdout` CLI parameter, where to put the decks zip file
