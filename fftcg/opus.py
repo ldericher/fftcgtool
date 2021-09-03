@@ -84,12 +84,13 @@ class Opus(Cards):
     def elemental_decks(self) -> list[TTSDeck]:
         if self.number in ["PR", "B"]:
             return [TTSDeck(
-                [
+                codes=[
                     card.code
                     for card in self
                 ],
-                f"{self.name}",
-                f"All {self.name} Cards"
+                name=f"{self.name}",
+                description=f"All {self.name} Cards",
+                face_down=False,
             )]
 
         else:
@@ -116,11 +117,12 @@ class Opus(Cards):
             cards.sort(key=lambda x: "Multi" if len(x.elements) > 1 else x.elements[0])
 
             return [TTSDeck(
-                [
+                codes=[
                     card.code
                     for card in cards
                     if f(card)
                 ],
-                f"{self.name} {elem}",
-                f"All {self.name} Cards with {elem} element in alphabetical order"
+                name=f"{self.name} {elem}",
+                description=f"All {self.name} Cards with {elem} element in alphabetical order",
+                face_down=False,
             ) for elem, f in filters.items()]

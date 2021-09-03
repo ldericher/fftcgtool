@@ -13,9 +13,10 @@ from .utils import CARD_BACK_URL, DECKS_DIR_NAME
 
 
 class TTSDeck(Cards):
-    def __init__(self, codes: list[Code], name: str, description: str):
+    def __init__(self, codes: list[Code], name: str, description: str, face_down: bool):
         super().__init__(name)
         self.__description = description
+        self.__face_down = face_down
 
         # get cards from carddb
         carddb = CardDB()
@@ -28,15 +29,65 @@ class TTSDeck(Cards):
 
     @classmethod
     def from_ffdecks_deck(cls, deck_id: str) -> TTSDeck:
+        # api request
         req = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
-        codes = [
-            Code(card["card"]["serial_number"])
-            for card in req.json()["cards"]
-        ]
-        name = f"{req.json()['name']} ({deck_id})"
-        description = req.json()["description"]
 
-        return cls(codes, name, description)
+        # pre-extract the used data
+        deck_cards = [{
+            "code": card["card"]["serial_number"],
+            "type": card["card"]["type"],
+            "cost": int(card["card"]["cost"]),
+            "count": int(card["quantity"]),
+        } for card in req.json()["cards"]]
+
+        # sort cards by type, then by cost
+        def by_type(data: dict[str, str | int]) -> int:
+            key_prios = {
+                "Forward": 1,
+                "Summon": 2,
+                "Monster": 3,
+                "Backup": 5,
+            }
+
+            if data["type"] in key_prios:
+                return key_prios[data["type"]]
+            else:
+                return 4
+
+        def by_cost(data: dict[str, str | int]) -> int:
+            return data["cost"]
+
+        deck_cards.sort(key=by_cost)
+        deck_cards.sort(key=by_type)
+
+        # ffdecks quirk: some full-art promos in database
+        replace_full_arts = {
+            # line format:
+            # full-art-id: normal id,
+            "PR-051": "11-083",
+            "PR-055": "11-062",
+        }
+
+        # replace with non
+        for card in deck_cards:
+            if card["code"] in replace_full_arts:
+                card["code"] = replace_full_arts[card["code"]]
+
+        codes = [
+            # create list of code objects
+            Code(card["code"])
+            # for each card
+            for card in deck_cards
+            # repeat to meet count
+            for _ in range(card["count"])
+        ]
+
+        # general metadata
+        name = f"{req.json()['name']}"
+        description = deck_id
+
+        # create deck object
+        return cls(codes, name, description, True)
 
     def tts_object(self, language: Language) -> dict[str, any]:
         carddb = CardDB()
@@ -100,7 +151,7 @@ class TTSDeck(Cards):
         ]
 
         # create the deck dictionary
-        return {"ObjectStates": [
+        deck_dict = {"ObjectStates": [
             {
                 "Nickname": self.name,
                 "Description": self.__description,
@@ -113,6 +164,12 @@ class TTSDeck(Cards):
                 "SidewaysCard": False,
             } | common_dict
         ]}
+
+        if self.__face_down:
+            # flip the deck
+            deck_dict["ObjectStates"][0]["Transform"]["rotZ"] = 180.0
+
+        return deck_dict
 
     def save(self, language: Language) -> None:
         # only save if the deck contains cards
