@@ -163,7 +163,7 @@ def main() -> None:
                 for deck in decks:
                     zip_file.writestr(deck.file_name, deck.get_json(args.language))
 
-            # write zip file to stdout
+            # write buffer to stdout
             buffer.seek(0)
             with open(sys.stdout.fileno(), "wb", closefd=False, buffering=0) as stdout:
                 stdout.write(buffer.read())

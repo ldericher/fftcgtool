@@ -30,9 +30,9 @@ subcommands:
    Also, `pipenv` should be installed for that python version.
    Refer to [pipenv installation guide](https://pipenv.pypa.io/en/latest/install/) if needed.
 2. To install `fftcgtool` dependencies, run `pipenv install --deploy` from project root directory.
-3. Run `pipenv run ./main.py` from project root directory.
-4. You can `alias fftcgtool='PIPENV_PIPFILE="'$(pwd)'/Pipfile" pipenv run "'$(pwd)'/main.py"'` from
-   project root directory to define `fftcgtool` shorthand for your running shell.
+3. Run `pipenv run ./fftcgtool.py` from project root directory.
+4. You can `alias fftcgtool='PIPENV_PIPFILE="'$(pwd)'/Pipfile" pipenv run "'$(pwd)'/fftcgtool.py"'` from project root
+   directory to define `fftcgtool` shorthand for your running shell.
 
 ### Run using a `docker` container
 
