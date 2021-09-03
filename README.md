@@ -40,11 +40,9 @@ subcommands:
 > All generated files will thus be owned by `root:root` by default.
 
 1. Make sure you have a working installation of `docker` software.
-2. Update your local image
-   - Either use `docker pull ldericher/fftcgtool`
-   - Or build it yourself
-      1. Clone this repository
-      2. Inside this directory, run `docker build --pull --tag ldericher/fftcgtool .`
+2. Update your local image.
+   - Either use `docker pull ldericher/fftcgtool`.
+   - Or build it yourself: Clone this repository and run `docker build --pull --tag ldericher/fftcgtool .` inside.
 3. Run `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool` in any directory.
 4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool'`
    to define `fftcgtool` shorthand for your running shell.
