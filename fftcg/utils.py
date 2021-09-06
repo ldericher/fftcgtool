@@ -10,7 +10,6 @@ GRID = Grid((10, 7))  # default in TTsim: 10 columns, 7 rows
 RESOLUTION = Grid((429, 600))  # default in TTsim: 480x670 pixels per card
 DECKS_DIR_NAME = "decks"  # name of decks directory
 IMAGES_DIR_NAME = "images"  # name of images directory
-CARDDB_FILE_NAME = "carddb.zip"  # name of card db file
 # card back URL (image by Aurik)
 CARD_BACK_URL = "http://cloud-3.steamusercontent.com/ugc/948455238665576576/85063172B8C340602E8D6C783A457122F53F7843/"
 

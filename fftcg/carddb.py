@@ -1,93 +1,121 @@
 from __future__ import annotations
 
+import io
 import json
 import pickle
 import zipfile
+from os import PathLike
+from typing import IO
+
+import requests
 
 from .card import Card
 from .cards import Cards
 from .code import Code
 from .language import API_LANGS
-from .utils import CARDDB_FILE_NAME
 
 
 class CardDB:
-    __instance: CardDB = None
-    __cards: dict[Code, Card]
-    __face_to_url: dict[str, str]
+    _instance: CardDB = None
+    _cards: dict[Code, Card]
+    _face_to_url: dict[str, str]
 
-    __DB_FILE_NAME = "cards.pickle"
-    __MAPPING_FILE_NAME = "face_to_url.json"
+    _DB_FILE_NAME = "cards.pickle"
+    _MAPPING_FILE_NAME = "face_to_url.json"
 
-    def __new__(cls) -> CardDB:
-        if CardDB.__instance is None:
-            CardDB.__instance = object.__new__(cls)
-            CardDB.__instance.__cards = {}
-            CardDB.__instance.__face_to_url = {}
+    def __new__(cls, *more) -> CardDB:
+        if CardDB._instance is None:
+            CardDB._instance = object.__new__(CardDB)
 
-        return CardDB.__instance
+        return CardDB._instance
+
+    def __init__(self, db_url: str = None):
+        if db_url is not None:
+            res = requests.get(db_url, stream=True)
+            if not res.ok:
+                raise ValueError("Invalid URL given to CardDB!")
+
+            self._load(io.BytesIO(res.content))
+
+    def _load(self, db: PathLike[str] | IO[bytes]):
+        try:
+            # unpickle db file
+            with zipfile.ZipFile(db, "r") as zip_file:
+                # cards db
+                with zip_file.open(CardDB._DB_FILE_NAME, "r") as file:
+                    self._cards = pickle.load(file)
+
+                # face_to_url mapping
+                with zip_file.open(CardDB._MAPPING_FILE_NAME, "r") as file:
+                    self._face_to_url = json.load(file)
+
+        except FileNotFoundError:
+            self._cards = {}
+            self._face_to_url = {}
 
     def __contains__(self, item: Code) -> bool:
-        return item in self.__cards
+        return item in self._cards
 
     def __getitem__(self, code: Code) -> Card:
-        return self.__cards[code]
+        return self._cards[code]
 
     def get_face_url(self, face: str) -> str:
-        if face in self.__face_to_url:
-            return self.__face_to_url[face]
+        if face in self._face_to_url:
+            return self._face_to_url[face]
         else:
             return face
 
-    def __pickle(self) -> None:
-        with zipfile.ZipFile(CARDDB_FILE_NAME, "w", compression=zipfile.ZIP_LZMA) as zip_file:
+    def save(self) -> None:
+        return
+
+    def update(self, cards: Cards) -> None:
+        return
+
+    def upload_prompt(self) -> None:
+        return
+
+
+class RWCardDB(CardDB):
+    __db_path: PathLike[str]
+
+    def __new__(cls, *more) -> RWCardDB:
+        if CardDB._instance is None:
+            CardDB._instance = object.__new__(RWCardDB)
+
+        return CardDB._instance
+
+    def __init__(self, db_path: PathLike[str] = None):
+        super().__init__(None)
+
+        if db_path is not None:
+            self.__db_path = db_path
+            self._load(self.__db_path)
+
+    def save(self) -> None:
+        with zipfile.ZipFile(self.__db_path, "w", compression=zipfile.ZIP_LZMA) as zip_file:
             # cards db
-            with zip_file.open(CardDB.__DB_FILE_NAME, "w") as file:
-                pickle.dump(self.__cards, file)
+            with zip_file.open(CardDB._DB_FILE_NAME, "w") as file:
+                pickle.dump(self._cards, file)
 
             # face_to_url mapping
-            with zip_file.open(CardDB.__MAPPING_FILE_NAME, "w") as file:
-                file.write(json.dumps(self.__face_to_url, indent=2).encode("utf-8"))
-
-    def __unpickle(self) -> None:
-        # unpickle db file
-        self.__cards.clear()
-        self.__face_to_url.clear()
-        try:
-            with zipfile.ZipFile(CARDDB_FILE_NAME, "r") as zip_file:
-                # cards db
-                with zip_file.open(CardDB.__DB_FILE_NAME, "r") as file:
-                    self.__cards |= pickle.load(file)
-
-                # face_to_url mapping
-                with zip_file.open(CardDB.__MAPPING_FILE_NAME, "r") as file:
-                    self.__face_to_url |= json.load(file)
-
-        except FileNotFoundError:
-            pass
-
-    def load(self) -> None:
-        self.__unpickle()
+            with zip_file.open(CardDB._MAPPING_FILE_NAME, "w") as file:
+                file.write(json.dumps(self._face_to_url, indent=2).encode("utf-8"))
 
     def update(self, cards: Cards) -> None:
         for card in cards:
-            self.__cards[card.code] = card
-
-        self.__pickle()
+            self._cards[card.code] = card
 
     def upload_prompt(self) -> None:
         faces = list(set([
             card[lang].face
-            for card in self.__cards.values()
+            for card in self._cards.values()
             for lang in API_LANGS
             if card[lang].face
         ]))
         faces.sort()
 
         for face in faces:
-            if face not in self.__face_to_url:
+            if face not in self._face_to_url:
                 face_url = input(f"Upload '{face}' and paste URL: ")
                 if face_url:
-                    self.__face_to_url[face] = face_url
-
-        self.__pickle()
+                    self._face_to_url[face] = face_url
