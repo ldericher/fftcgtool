@@ -66,9 +66,9 @@ class TTSDeck(Cards):
             deck_id = match.groups()[3]
 
         # api request
-        req = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
+        res = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
 
-        if req.status_code != 200:
+        if not res.ok:
             logger.error("Invalid Deck ID for FFDecks API!")
             return cls([], "", "", True)
 
@@ -80,7 +80,7 @@ class TTSDeck(Cards):
             "type": card["card"]["type"],
             "cost": int(card["card"]["cost"]),
             "count": int(card["quantity"]),
-        } for card in req.json()["cards"]]
+        } for card in res.json()["cards"]]
 
         # sort cards by type, then by cost
         def by_type(data: dict[str, str | int]) -> int:
@@ -125,7 +125,7 @@ class TTSDeck(Cards):
         ]
 
         # general metadata
-        name = f"{req.json()['name']}"
+        name = f"{res.json()['name']}"
         description = deck_id
 
         # create deck object

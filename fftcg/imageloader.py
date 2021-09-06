@@ -31,7 +31,7 @@ class ImageLoader:
                 pass
 
         # if rejected, substitute the english version
-        if not res.status_code == 200:
+        if not res.ok:
             logger.warning(f"falling back to english version of {url}")
             return cls._load_inner((base_url, code, FALLBACK_LANGUAGE.image_suffix))
 
