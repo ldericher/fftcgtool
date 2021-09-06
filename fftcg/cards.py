@@ -12,7 +12,7 @@ class Cards(list[Card]):
         self.__name = name
 
     def __repr__(self) -> str:
-        return f"[{', '.join(str(card) for card in self)}]"
+        return f"{self.name!r} ({len(self)} Cards)"
 
     def __str__(self) -> str:
         return repr(self)

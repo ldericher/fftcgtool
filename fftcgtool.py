@@ -178,18 +178,25 @@ def ffdecks(deck_ids) -> list[fftcg.TTSDeck]:
 
 @main.result_callback()
 def finalize(decks: list[fftcg.TTSDeck], **kwargs):
+    logger = logging.getLogger(__name__)
+
     # decide what to do with the decks
     if kwargs["zip"] is not None:
+        logger.debug("Outputting decks to ZIP")
         if decks:
             # create zip file
             with zipfile.ZipFile(kwargs["zip"], "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
                 # put the decks into that zip file
                 for deck in decks:
+                    logger.debug(f"Saving Deck {deck!r}")
                     zip_file.writestr(deck.file_name, deck.get_json(kwargs["language"]))
 
     else:
+        logger.debug("Outputting decks to disk")
+
         # save the decks to disk
         for deck in decks:
+            logger.debug(f"Saving Deck {deck!r}")
             deck.save(kwargs["language"])
 
         # bye
