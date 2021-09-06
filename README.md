@@ -13,8 +13,12 @@ Usage: fftcgtool.py [OPTIONS] COMMAND [ARGS]...
 Options:
   -v, --verbose        increase output verbosity  [x>=0]
   -l, --language LANG  language for imported objects
-  -s, --stdout         print the deck files in a zip archive to stdout, skip
-                       creating JSONs on disk
+  -z, --zip FILE       wrap deck files into a zip archive, skip creating
+                       individual JSONs
+  -o, --output DIR     use specified output directory instead of ./out
+  -u, --db-url URL     load immutable CardDB from URL instead of local,
+                       overrides -f
+  -f, --db-file FILE   use specified CardDB file instead of ./out/carddb.zip
   --help               Show this message and exit.
 
 Commands:
@@ -109,6 +113,3 @@ as `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool -n 2 5` (im
 ## To-Do-List
 
 - `deck` subcommand, which would read a custom deck list in text format
-- `db` CLI parameter, which card db zip to use, also load zip from URL
-- `rw` CLI parameter, enable writing to db zip file (incompatible with zip URL)
-- `stdout` CLI parameter, where to put the decks zip file
