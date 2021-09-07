@@ -86,25 +86,22 @@ Show more info about the `ffdecks` subcommand.
 
 ### Using your system's `python3`
 
-1. Make sure you have at least python version `3.9` installed. To test, run `python --version` or similar.
-   Also, `pipenv` should be installed for that python version. Refer
-   to [pipenv installation guide](https://pipenv.pypa.io/en/latest/install/) if needed.
-2. To install `fftcgtool` dependencies, run `pipenv install --deploy` from project root directory.
+1. Make sure you have at least python version `3.9` with `pip` installed. To test, run `python --version` or similar.
+2. Install `fftcgtool`.
+    - Either from this repository: Use `pip install "git+https://github.com/ldericher/fftcgtool"`.
+    - Or from your local source: Clone this repository and run `pip install /path/to/fftcgtool`.
 3. Run `pipenv run ./fftcgtool.py` from project root directory.
 4. You can `alias fftcgtool='PIPENV_PIPFILE="'$(pwd)'/Pipfile" pipenv run "'$(pwd)'/fftcgtool.py"'` from project root
    directory to define `fftcgtool` shorthand for your running shell.
 
 ### Using a `docker` container
 
-> Caveat: This simplistic container runs `fftcgtool` as root user.
-> Directly generated files will thus be owned by `root:root` by default.
-
 1. Make sure you have a working installation of `docker` software.
 2. Update your local image.
-   - Either use `docker pull ldericher/fftcgtool`.
-   - Or build it yourself: Clone this repository and run `docker build --pull --tag ldericher/fftcgtool .` inside.
+    - Either use `docker pull ldericher/fftcgtool`.
+    - Or build it yourself: Clone this repository and run `docker build --pull --tag ldericher/fftcgtool .` inside.
 3. Run `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool` in any directory.
-4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool'`
+4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" -u "$(id -u):$(id -g)" ldericher/fftcgtool'`
    to define `fftcgtool` shorthand for your running shell.
 
 Output files will go to subdirectory `./out`. CLI arguments are supported
