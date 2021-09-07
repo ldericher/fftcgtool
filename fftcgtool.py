@@ -6,17 +6,17 @@ import zipfile
 
 import click
 
-import fftcg
+import fftcgtool
 
 
 class LanguageParamType(click.ParamType):
-    def convert(self, value, param, ctx) -> fftcg.Language:
-        if isinstance(value, fftcg.Language):
+    def convert(self, value, param, ctx) -> fftcgtool.Language:
+        if isinstance(value, fftcgtool.Language):
             return value
         elif isinstance(value, str):
-            return fftcg.Language(value)
+            return fftcgtool.Language(value)
         else:
-            return fftcg.Language("")
+            return fftcgtool.Language("")
 
 
 LANGUAGE = LanguageParamType()
@@ -102,14 +102,14 @@ def main(ctx, **kwargs) -> None:
     # load the current carddb
     if kwargs["db_url"] is not None:
         try:
-            fftcg.CardDB(kwargs["db_url"])
+            fftcgtool.CardDB(kwargs["db_url"])
 
         except (ValueError, KeyError, zipfile.BadZipFile) as cause:
             logger.critical(f"Couldn't initialize CardDB: {cause}")
             sys.exit(1)
 
     else:
-        fftcg.RWCardDB(kwargs["db_file"])
+        fftcgtool.RWCardDB(kwargs["db_file"])
 
 
 @main.command()
@@ -126,7 +126,7 @@ def main(ctx, **kwargs) -> None:
     metavar="[OPUS-ID] ...",
 )
 @click.pass_context
-def opuses(ctx, opus_ids, num_requests) -> list[fftcg.TTSDeck]:
+def opuses(ctx, opus_ids, num_requests) -> list[fftcgtool.TTSDeck]:
     """
     Imports Opuses from the square API and creates its elemental decks as JSON files.
 
@@ -134,14 +134,14 @@ def opuses(ctx, opus_ids, num_requests) -> list[fftcg.TTSDeck]:
     """
 
     ctx.ensure_object(dict)
-    language = ctx.obj["language"] or fftcg.Language("")
+    language = ctx.obj["language"] or fftcgtool.Language("")
 
-    carddb = fftcg.CardDB()
-    decks: list[fftcg.TTSDeck] = []
+    carddb = fftcgtool.CardDB()
+    decks: list[fftcgtool.TTSDeck] = []
     for opus_id in opus_ids:
         # import an opus
-        opus = fftcg.Opus(opus_id, language)
-        book = fftcg.Book(opus, language, num_requests)
+        opus = fftcgtool.Opus(opus_id, language)
+        book = fftcgtool.Book(opus, language, num_requests)
         book.save()
 
         carddb.update(opus)
@@ -161,23 +161,23 @@ def opuses(ctx, opus_ids, num_requests) -> list[fftcg.TTSDeck]:
     type=str,
     metavar="[DECK-ID] ...",
 )
-def ffdecks(deck_ids) -> list[fftcg.TTSDeck]:
+def ffdecks(deck_ids) -> list[fftcgtool.TTSDeck]:
     """
     Imports Decks from the ffdecks.com API and creates it as a JSON file.
 
     DECK_ID: each of the Decks to import
     """
 
-    decks: list[fftcg.TTSDeck] = []
+    decks: list[fftcgtool.TTSDeck] = []
     for deck_id in deck_ids:
         # import a deck
-        decks.append(fftcg.TTSDeck.from_ffdecks_deck(deck_id))
+        decks.append(fftcgtool.TTSDeck.from_ffdecks_deck(deck_id))
 
     return decks
 
 
 @main.result_callback()
-def finalize(decks: list[fftcg.TTSDeck], **kwargs):
+def finalize(decks: list[fftcgtool.TTSDeck], **kwargs):
     logger = logging.getLogger(__name__)
 
     # decide what to do with the decks
