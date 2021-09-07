@@ -1,8 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="fftcgtool",
     version="0.2",
+    packages=find_packages(),
     author="LDericher",
     author_email="ldericher@gmx.de",
     setup_requires="setuptools-pipfile",
