@@ -90,9 +90,7 @@ Show more info about the `ffdecks` subcommand.
 2. Install `fftcgtool`.
     - Either from this repository: Use `pip install "git+https://github.com/ldericher/fftcgtool"`.
     - Or from your local source: Clone this repository and run `pip install /path/to/fftcgtool`.
-3. Run `pipenv run ./fftcgtool.py` from project root directory.
-4. You can `alias fftcgtool='PIPENV_PIPFILE="'$(pwd)'/Pipfile" pipenv run "'$(pwd)'/fftcgtool.py"'` from project root
-   directory to define `fftcgtool` shorthand for your running shell.
+3. You can now run `fftcgtool` in any directory.
 
 ### Using a `docker` container
 
@@ -100,7 +98,7 @@ Show more info about the `ffdecks` subcommand.
 2. Update your local image.
     - Either use `docker pull ldericher/fftcgtool`.
     - Or build it yourself: Clone this repository and run `docker build --pull --tag ldericher/fftcgtool .` inside.
-3. Run `docker run --rm -it -v "$(pwd)/out:/app/out" ldericher/fftcgtool` in any directory.
+3. Run `docker run --rm -it -v "$(pwd)/out:/app/out" -u "$(id -u):$(id -g)" ldericher/fftcgtool` in any directory.
 4. You can `alias fftcgtool='docker run --rm -it -v "$(pwd)/out:/app/out" -u "$(id -u):$(id -g)" ldericher/fftcgtool'`
    to define `fftcgtool` shorthand for your running shell.
 
