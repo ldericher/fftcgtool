@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Iterator
 
 import requests
 
@@ -52,42 +52,23 @@ class TTSDeck(Cards):
     __RE_FFDECKS_ID = re.compile(r"((https?://)?ffdecks\.com(/+api)?/+deck/+)?([0-9]+).*", flags=re.UNICODE)
 
     @classmethod
-    def from_ffdecks_deck(cls, deck_id: str) -> Optional[TTSDeck]:
+    def sanitized_ids(cls, deck_ids: Iterable) -> Iterator[Optional[str]]:
+        matches = (
+            cls.__RE_FFDECKS_ID.match(str(deck_id))
+            for deck_id in deck_ids
+        )
+
+        return (
+            match.groups()[3]
+            if match is not None
+            else None
+            for match in matches
+        )
+
+    @classmethod
+    def from_ffdecks_decks(cls, deck_ids: Iterable) -> Iterator[TTSDeck]:
         logger = logging.getLogger(__name__)
 
-        # check deck id
-        match = TTSDeck.__RE_FFDECKS_ID.match(deck_id)
-
-        if match is None:
-            logger.error("Malformed Deck ID for FFDecks API!")
-            return None
-
-        else:
-            # extract deck id from match
-            deck_id = match.groups()[3]
-
-        # api request
-        res = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
-
-        if not res.ok:
-            logger.error("Invalid Deck ID for FFDecks API!")
-            return None
-
-        # general metadata
-        name = f"{res.json()['name']}"
-        description = deck_id
-
-        logger.info(f"Importing Deck {name!r}")
-
-        # pre-extract the used data
-        deck_cards = [{
-            "code": card["card"]["serial_number"],
-            "type": card["card"]["type"],
-            "cost": int(card["card"]["cost"]),
-            "count": int(card["quantity"]),
-        } for card in res.json()["cards"]]
-
-        # sort cards by type, then by cost
         def by_type(data: dict[str, str | int]) -> int:
             key_prios = {
                 "Forward": 1,
@@ -104,43 +85,60 @@ class TTSDeck(Cards):
         def by_cost(data: dict[str, str | int]) -> int:
             return data["cost"]
 
-        deck_cards.sort(key=by_cost)
-        deck_cards.sort(key=by_type)
+        for deck_id in cls.sanitized_ids(deck_ids):
+            if deck_id is None:
+                logger.error("Malformed Deck ID for FFDecks API!")
 
-        # ffdecks quirk: some full-art promos in database
-        replace_full_arts = {
-            # line format:
-            # full-art-id: normal id,
-            "PR-051": "11-083",
-            "PR-055": "11-062",
-        }
+            else:
+                # api request
+                res = requests.get(TTSDeck.__FFDECKS_API_URL, params={"deck_id": deck_id})
 
-        # replace with normal-art cards
-        for card in deck_cards:
-            if card["code"] in replace_full_arts:
-                card["code"] = replace_full_arts[card["code"]]
+                if not res.ok:
+                    logger.error(f"Invalid Deck ID '{deck_id}' for FFDecks API!")
 
-        codes = [
-            # create list of code objects
-            Code(card["code"])
-            # for each card
-            for card in deck_cards
-            # repeat to meet count
-            for _ in range(card["count"])
-        ]
+                else:
+                    # general metadata
+                    name = f"{res.json()['name']}"
+                    description = deck_id
 
-        # create deck object
-        return cls(codes, name, description, True)
+                    logger.info(f"Importing Deck {name!r}")
 
-    @classmethod
-    def from_ffdecks_decks(cls, deck_ids: Iterable[str]) -> list[TTSDeck]:
-        return [
-            deck
-            for deck in (
-                cls.from_ffdecks_deck(deck_id)
-                for deck_id in deck_ids
-            ) if deck is not None
-        ]
+                    # pre-extract the used data
+                    deck_cards = [{
+                        "code": card["card"]["serial_number"],
+                        "type": card["card"]["type"],
+                        "cost": int(card["card"]["cost"]),
+                        "count": int(card["quantity"]),
+                    } for card in res.json()["cards"]]
+
+                    # sort cards by type, then by cost
+                    deck_cards.sort(key=by_cost)
+                    deck_cards.sort(key=by_type)
+
+                    # ffdecks quirk: some full-art promos in database
+                    replace_full_arts = {
+                        # line format:
+                        # full-art-id: normal id,
+                        "PR-051": "11-083",
+                        "PR-055": "11-062",
+                    }
+
+                    # replace with normal-art cards
+                    for card in deck_cards:
+                        if card["code"] in replace_full_arts:
+                            card["code"] = replace_full_arts[card["code"]]
+
+                    codes = [
+                        # create list of code objects
+                        Code(card["code"])
+                        # for each card
+                        for card in deck_cards
+                        # repeat to meet count
+                        for _ in range(card["count"])
+                    ]
+
+                    # create deck object
+                    yield cls(codes, name, description, True)
 
     def get_tts_object(self, language: Language) -> dict[str, any]:
         carddb = CardDB()

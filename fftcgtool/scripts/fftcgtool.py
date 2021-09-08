@@ -168,7 +168,7 @@ def ffdecks(deck_ids: list[str]) -> list[fftcgtool.TTSDeck]:
     DECK_ID: each of the Decks to import
     """
 
-    return fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids)
+    return list(fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids))
 
 
 @main.result_callback()
