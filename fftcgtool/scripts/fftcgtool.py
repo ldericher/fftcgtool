@@ -126,7 +126,7 @@ def main(ctx, **kwargs) -> None:
     metavar="[OPUS-ID] ...",
 )
 @click.pass_context
-def opuses(ctx, opus_ids, num_requests) -> list[fftcgtool.TTSDeck]:
+def opuses(ctx, opus_ids: list[str], num_requests: int) -> list[fftcgtool.TTSDeck]:
     """
     Imports Opuses from the square API and creates its elemental decks as JSON files.
 
@@ -161,7 +161,7 @@ def opuses(ctx, opus_ids, num_requests) -> list[fftcgtool.TTSDeck]:
     type=str,
     metavar="[DECK-ID] ...",
 )
-def ffdecks(deck_ids) -> list[fftcgtool.TTSDeck]:
+def ffdecks(deck_ids: list[str]) -> list[fftcgtool.TTSDeck]:
     """
     Imports Decks from the ffdecks.com API and creates it as a JSON file.
 
@@ -183,6 +183,7 @@ def finalize(decks: list[fftcgtool.TTSDeck], **kwargs):
     # decide what to do with the decks
     if kwargs["zip"] is not None:
         logger.debug("Outputting decks to ZIP")
+
         if decks:
             # create zip file
             with zipfile.ZipFile(kwargs["zip"], "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
