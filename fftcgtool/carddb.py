@@ -84,7 +84,7 @@ class RWCardDB(CardDB):
 
         return CardDB._instance
 
-    def __init__(self, db_path: PathLike[str] = None):
+    def __init__(self, db_path: str | PathLike[str] = None):
         super().__init__(None)
 
         if db_path is not None:
