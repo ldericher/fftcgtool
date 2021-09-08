@@ -37,7 +37,7 @@ class CardDB:
 
             self._load(io.BytesIO(res.content))
 
-    def _load(self, db: PathLike[str] | IO[bytes]):
+    def _load(self, db: str | PathLike[str] | IO[bytes]):
         try:
             # unpickle db file
             with zipfile.ZipFile(db, "r") as zip_file:
