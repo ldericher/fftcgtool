@@ -168,12 +168,7 @@ def ffdecks(deck_ids: list[str]) -> list[fftcgtool.TTSDeck]:
     DECK_ID: each of the Decks to import
     """
 
-    decks: list[fftcgtool.TTSDeck] = []
-    for deck_id in deck_ids:
-        # import a deck
-        decks.append(fftcgtool.TTSDeck.from_ffdecks_deck(deck_id))
-
-    return decks
+    return fftcgtool.TTSDeck.from_ffdecks_decks(deck_ids)
 
 
 @main.result_callback()

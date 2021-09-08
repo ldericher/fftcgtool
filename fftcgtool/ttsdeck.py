@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from typing import Optional, Iterable
 
 import requests
 
@@ -51,7 +52,7 @@ class TTSDeck(Cards):
     __RE_FFDECKS_ID = re.compile(r"((https?://)?ffdecks\.com(/+api)?/+deck/+)?([0-9]+).*", flags=re.UNICODE)
 
     @classmethod
-    def from_ffdecks_deck(cls, deck_id: str) -> TTSDeck:
+    def from_ffdecks_deck(cls, deck_id: str) -> Optional[TTSDeck]:
         logger = logging.getLogger(__name__)
 
         # check deck id
@@ -59,7 +60,7 @@ class TTSDeck(Cards):
 
         if match is None:
             logger.error("Malformed Deck ID for FFDecks API!")
-            return cls([], "", "", True)
+            return None
 
         else:
             # extract deck id from match
@@ -70,9 +71,13 @@ class TTSDeck(Cards):
 
         if not res.ok:
             logger.error("Invalid Deck ID for FFDecks API!")
-            return cls([], "", "", True)
+            return None
 
-        logger.info(f"Importing Deck {deck_id}")
+        # general metadata
+        name = f"{res.json()['name']}"
+        description = deck_id
+
+        logger.info(f"Importing Deck {name!r}")
 
         # pre-extract the used data
         deck_cards = [{
@@ -124,12 +129,18 @@ class TTSDeck(Cards):
             for _ in range(card["count"])
         ]
 
-        # general metadata
-        name = f"{res.json()['name']}"
-        description = deck_id
-
         # create deck object
         return cls(codes, name, description, True)
+
+    @classmethod
+    def from_ffdecks_decks(cls, deck_ids: Iterable[str]) -> list[TTSDeck]:
+        return [
+            deck
+            for deck in (
+                cls.from_ffdecks_deck(deck_id)
+                for deck_id in deck_ids
+            ) if deck is not None
+        ]
 
     def get_tts_object(self, language: Language) -> dict[str, any]:
         carddb = CardDB()
