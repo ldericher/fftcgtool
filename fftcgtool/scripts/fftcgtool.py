@@ -202,3 +202,7 @@ def finalize(decks: list[fftcgtool.TTSDeck], **kwargs):
         # bye
         print("Done. Put the generated JSON files in your 'Saved Objects' Folder.")
         print("Thanks for using fftcgtool!")
+
+
+if __name__ == "__main__":
+    main()
