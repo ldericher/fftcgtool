@@ -73,9 +73,12 @@ class Opus(Cards):
         self.sort(key=lambda x: x.code.opus)
 
         for card in self:
-            if card.code in carddb:
+            try:
                 for lang in API_LANGS:
                     card[lang] = replace(card[lang], face=carddb[card.code][lang].face)
+
+            except KeyError:
+                pass
 
             logger.debug(f"imported card {card}")
 

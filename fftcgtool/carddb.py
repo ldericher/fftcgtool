@@ -31,11 +31,16 @@ class CardDB:
 
     def __init__(self, db_url: str = None):
         if db_url is not None:
-            res = requests.get(db_url, stream=True)
-            if not res.ok:
-                raise ValueError("Invalid URL given to CardDB!")
+            try:
+                with open(db_url, "rb") as db_file:
+                    self._load(db_file)
 
-            self._load(io.BytesIO(res.content))
+            except FileNotFoundError:
+                res = requests.get(db_url, stream=True)
+                if not res.ok:
+                    raise ValueError("Invalid URL given to CardDB!")
+
+                self._load(io.BytesIO(res.content))
 
     def _load(self, db: str | PathLike[str] | IO[bytes]):
         try:
@@ -60,9 +65,9 @@ class CardDB:
         return self._cards[code]
 
     def get_face_url(self, face: str) -> str:
-        if face in self._face_to_url:
+        try:
             return self._face_to_url[face]
-        else:
+        except KeyError:
             return face
 
     def save(self) -> None:

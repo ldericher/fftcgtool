@@ -77,9 +77,9 @@ class TTSDeck(Cards):
                 "Backup": 5,
             }
 
-            if data["type"] in key_prios:
+            try:
                 return key_prios[data["type"]]
-            else:
+            except KeyError:
                 return 4
 
         def by_cost(data: dict[str, str | int]) -> int:
@@ -125,8 +125,10 @@ class TTSDeck(Cards):
 
                     # replace with normal-art cards
                     for card in deck_cards:
-                        if card["code"] in replace_full_arts:
+                        try:
                             card["code"] = replace_full_arts[card["code"]]
+                        except KeyError:
+                            pass
 
                     codes = [
                         # create list of code objects
