@@ -78,15 +78,15 @@ def main(ctx, **kwargs) -> None:
 
     # set up logging
     if kwargs["verbose"] == 0:
-        verbose = logging.WARN
+        log_level = logging.WARN
     elif kwargs["verbose"] == 1:
-        verbose = logging.INFO
+        log_level = logging.INFO
     else:
-        verbose = logging.DEBUG
+        log_level = logging.DEBUG
 
     logging.basicConfig(
-        level=verbose,
-        format="%(levelname)s: %(processName)s %(message)s",
+        level=log_level,
+        format="%(levelname)s in %(name)s (#%(process)d): %(message)s",
     )
 
     logger = logging.getLogger(__name__)
