@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import sqlite3
 from dataclasses import dataclass
 
 from .code import Code
@@ -101,6 +102,59 @@ class Card:
                 ],
                 content=content,
             )
+
+    @classmethod
+    def sqlite_schema(cls, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `cards_indices` (
+                `code`  TEXT,
+                `index` INTEGER,
+                PRIMARY KEY(`code`)
+            ) WITHOUT ROWID;
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `cards_elements` (
+                `code`      TEXT,
+                `element`   TEXT,
+                PRIMARY KEY(`code`,`element`),
+                FOREIGN KEY(`code`) REFERENCES `cards_indices`(`code`)
+            ) WITHOUT ROWID;
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `cards_content` (
+                `code`	TEXT,
+                `language`	TEXT,
+                `name`	TEXT,
+                `text`	TEXT,
+                `face`	TEXT,
+                PRIMARY KEY(`code`,`language`),
+                FOREIGN KEY(`code`) REFERENCES `cards_indices`(`code`)
+            ) WITHOUT ROWID;
+        """)
+
+    def sqlite_save(self, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("""
+            UPDATE INTO `cards_indices` (`code`, `index`)
+            VALUES (?, ?)
+        """, (self.code.short, self.index))
+
+        cursor.executemany("""
+            UPDATE INTO `cards_content` (`code`, `language`, `name`, `text`, `face`)
+            VALUES(?, ?, ?, ?, ?)
+        """, (
+            (self.code.short, language.short, content.name, content.text, content.face)
+            for language, content in self.__content.items()
+        ))
+
+        cursor.executemany("""
+            UPDATE INTO `cards_elements` (`code`, `element`)
+            VALUES (?, ?)
+        """, (
+            (self.code.short, element)
+            for element in self.__elements
+        ))
 
     def __repr__(self) -> str:
         return f"Card(code={self.code!r}, content={self.__content!r})"

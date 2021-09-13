@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import pickle
+import sqlite3
 import zipfile
 from os import PathLike
 from typing import IO
@@ -96,6 +97,26 @@ class RWCardDB(CardDB):
             self.__db_path = db_path
             self._load(self.__db_path)
 
+    @classmethod
+    def sqlite_schema(cls, cursor: sqlite3.Cursor) -> None:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS `faces_urls` (
+                `face`  TEXT,
+                `url` TEXT,
+                PRIMARY KEY(`face`),
+                FOREIGN KEY(`face`) REFERENCES `cards_content`(`face`)
+            ) WITHOUT ROWID;
+        """)
+
+        cursor.execute("""
+            CREATE VIEW IF NOT EXISTS `cards` AS
+            SELECT `code`, `index`, `element`, `language`, `name`, `text`, `url`
+            FROM `cards_indices`
+            JOIN `cards_elements` USING(`code`)
+            JOIN `cards_content` USING(`code`)
+            JOIN `faces_urls` USING(`face`);
+        """)
+
     def save(self) -> None:
         with zipfile.ZipFile(self.__db_path, "w", compression=zipfile.ZIP_LZMA) as zip_file:
             # cards db
@@ -105,6 +126,22 @@ class RWCardDB(CardDB):
             # face_to_url mapping
             with zip_file.open(CardDB._MAPPING_FILE_NAME, "w") as file:
                 file.write(json.dumps(self._face_to_url, indent=2).encode("utf-8"))
+
+        with sqlite3.connect(self.__db_path + ".db") as connection:
+            cursor = connection.cursor()
+            cursor.execute("PRAGMA auto_vacuum=FULL;")
+            Card.sqlite_schema(cursor)
+            self.sqlite_schema(cursor)
+
+            for card in self._cards.values():
+                card.sqlite_save(cursor)
+
+            cursor.executemany("""
+                UPDATE INTO `faces_urls` (`face`, `url`)
+                VALUES(?, ?)
+            """, self._face_to_url.items())
+
+            connection.commit()
 
     def update(self, cards: Cards) -> None:
         for card in cards:
