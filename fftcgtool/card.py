@@ -59,17 +59,32 @@ class Card:
                 text = str(data[f"Text{language.key_suffix}"])
                 # place "S" symbols
                 text = text.replace("《S》", encircle_symbol("S", False))
-                # place other letter and numerical cost symbols
-                text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE | re.UNICODE)
                 # place elemental cost symbols
                 text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
                 # place dull symbols
                 text = text.replace("《ダル》", "[⤵]")
-                # replace formatting hints with brackets
-                text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
+                # relocate misplaced line break markers
+                text = re.sub(r"(\[\[[a-z]+]][^\[]*?)(\[\[br]])([^\[]*?\[\[/]])", r"\2\1\3", text,
+                              flags=re.IGNORECASE | re.UNICODE)
+                # # relocate misplaced spaces
+                # text = re.sub(r"(\[\[[a-z]+]][^\[]*?)\s+(\[\[/]])", r"\1\2 ", text, flags=re.IGNORECASE | re.UNICODE)
+                # text = re.sub(r"(\[\[[a-z]+]])\s+([^\[]*?\[\[/]])", r" \1\2", text, flags=re.IGNORECASE | re.UNICODE)
                 # place EX-BURST markers
                 text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text,
                               flags=re.IGNORECASE | re.UNICODE)
+                text = re.sub(r"([^\[]|^)(EX BURST)\s*([^]]|$)", r"\1[\2] \3", text, flags=re.UNICODE)
+                # replace Damage hints with brackets and en-dash
+                text = re.sub(r"\[\[i]](Schaden|Damage|Daños|Dégâts|Danni)\s*([0-9]+)\s*--\s*\[\[/]]\s*", r"[\1 \2] – ",
+                              text, flags=re.IGNORECASE | re.UNICODE)
+                # place other letter and numerical cost symbols
+                text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE | re.UNICODE)
+                # remove empty formatting hints
+                text = re.sub(r"\[\[[a-z]]]\s*\[\[/]]\s*", r" ", text, flags=re.IGNORECASE | re.UNICODE)
+                # replace formatting hints with brackets
+                text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
+                # relocate misplaced spaces
+                text = re.sub(r"(\[[^]]*?)\s+(])\s*", r"\1\2 ", text, flags=re.IGNORECASE | re.UNICODE)
+                text = re.sub(r"\s*(\[)\s+([^]]*?])", r" \1\2", text, flags=re.IGNORECASE | re.UNICODE)
                 # place line breaks
                 return re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
 
