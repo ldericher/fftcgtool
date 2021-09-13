@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Any
 
 from .code import Code
 from .language import Language, API_LANGS
@@ -15,20 +16,67 @@ class CardContent:
     face: str
 
 
+_ELEMENTS_JAP = [
+    "火", "氷", "風", "土", "雷", "水", "光", "闇"
+]
+
+_ELEMENTS_ENG = [
+    "Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Darkness"
+]
+
+_ELEMENTS_MAP = {
+    elem_j: elem_e
+    for elem_j, elem_e in zip(_ELEMENTS_JAP, _ELEMENTS_ENG)
+}
+
+
+def _sub_encircle(match: re.Match) -> str:
+    return encircle_symbol(match.group(1), False)
+
+
+def _sub_elements(match: re.Match) -> str:
+    return encircle_symbol(_ELEMENTS_MAP[match.group(1)], False)
+
+
+def _load_name(language: Language, data: dict[str, Any]) -> str:
+    return data[f"Name{language.key_suffix}"]
+
+
+def _load_text(language: Language, data: dict) -> str:
+    # load text
+    text = str(data[f"Text{language.key_suffix}"])
+    # place "S" symbols
+    text = text.replace("《S》", encircle_symbol("S", False))
+    # place elemental cost symbols
+    text = re.sub(rf"《([{''.join(_ELEMENTS_JAP)}])》", _sub_elements, text, flags=re.UNICODE)
+    # place dull symbols
+    text = text.replace("《ダル》", "[⤵]")
+    # relocate misplaced line break markers
+    text = re.sub(r"(\[\[[a-z]+]][^\[]*?)(\[\[br]])([^\[]*?\[\[/]])", r"\2\1\3", text,
+                  flags=re.IGNORECASE | re.UNICODE)
+    # place EX-BURST markers
+    text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text,
+                  flags=re.IGNORECASE | re.UNICODE)
+    # also place unmarked EX-BURST markers
+    text = re.sub(r"([^\[]|^)(EX BURST)\s*([^]]|$)", r"\1[\2] \3", text, flags=re.UNICODE)
+    # replace Damage hints with brackets and en-dash
+    text = re.sub(r"\[\[i]](Schaden|Damage|Daños|Dégâts|Danni)\s*([0-9]+)\s*--\s*\[\[/]]\s*", r"[\1 \2] – ",
+                  text, flags=re.IGNORECASE | re.UNICODE)
+    # place other letter and numerical cost symbols
+    text = re.sub(r"《([a-z0-9])》", _sub_encircle, text, flags=re.IGNORECASE | re.UNICODE)
+    # remove empty formatting hints
+    text = re.sub(r"\[\[[a-z]]]\s*\[\[/]]\s*", r" ", text, flags=re.IGNORECASE | re.UNICODE)
+    # replace formatting hints with brackets
+    text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
+    # relocate misplaced spaces at start of bracketed string
+    text = re.sub(r"\s*(\[)\s+([^]]*?])", r" \1\2", text, flags=re.IGNORECASE | re.UNICODE)
+    # relocate misplaced spaces at end of bracketed string
+    text = re.sub(r"(\[[^]]*?)\s+(])\s*", r"\1\2 ", text, flags=re.IGNORECASE | re.UNICODE)
+    # place line breaks
+    return re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
+
+
 class Card:
-    __ELEMENTS_JAP = [
-        "火", "氷", "風", "土", "雷", "水", "光", "闇"
-    ]
-
-    __ELEMENTS_ENG = [
-        "Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Darkness"
-    ]
-
-    __ELEMENTS_MAP = {
-        elem_j: elem_e
-        for elem_j, elem_e in zip(__ELEMENTS_JAP, __ELEMENTS_ENG)
-    }
-
     def __init__(self, code: Code, elements: list[str], content: dict[Language, CardContent], index: int = 0):
         self.__code: Code = code
         self.__elements: list[str] = elements
@@ -36,7 +84,7 @@ class Card:
         self.__index = index
 
     @classmethod
-    def from_square_api_data(cls, data: dict[str, any]) -> Card:
+    def from_square_api_data(cls, data: dict[str, Any]) -> Card:
         if not data:
             return cls(
                 code=Code(""),
@@ -45,61 +93,20 @@ class Card:
             )
 
         else:
-            def sub_encircle(match: re.Match) -> str:
-                return encircle_symbol(match.group(1), False)
-
-            def sub_elements(match: re.Match) -> str:
-                return encircle_symbol(Card.__ELEMENTS_MAP[match.group(1)], False)
-
-            def load_name(language: Language) -> str:
-                return data[f"Name{language.key_suffix}"]
-
-            def load_text(language: Language) -> str:
-                # load text
-                text = str(data[f"Text{language.key_suffix}"])
-                # place "S" symbols
-                text = text.replace("《S》", encircle_symbol("S", False))
-                # place elemental cost symbols
-                text = re.sub(rf"《([{''.join(Card.__ELEMENTS_JAP)}])》", sub_elements, text, flags=re.UNICODE)
-                # place dull symbols
-                text = text.replace("《ダル》", "[⤵]")
-                # relocate misplaced line break markers
-                text = re.sub(r"(\[\[[a-z]+]][^\[]*?)(\[\[br]])([^\[]*?\[\[/]])", r"\2\1\3", text,
-                              flags=re.IGNORECASE | re.UNICODE)
-                # # relocate misplaced spaces
-                # text = re.sub(r"(\[\[[a-z]+]][^\[]*?)\s+(\[\[/]])", r"\1\2 ", text, flags=re.IGNORECASE | re.UNICODE)
-                # text = re.sub(r"(\[\[[a-z]+]])\s+([^\[]*?\[\[/]])", r" \1\2", text, flags=re.IGNORECASE | re.UNICODE)
-                # place EX-BURST markers
-                text = re.sub(r"\[\[ex]]\s*EX BURST\s*\[\[/]]\s*", r"[EX BURST] ", text,
-                              flags=re.IGNORECASE | re.UNICODE)
-                text = re.sub(r"([^\[]|^)(EX BURST)\s*([^]]|$)", r"\1[\2] \3", text, flags=re.UNICODE)
-                # replace Damage hints with brackets and en-dash
-                text = re.sub(r"\[\[i]](Schaden|Damage|Daños|Dégâts|Danni)\s*([0-9]+)\s*--\s*\[\[/]]\s*", r"[\1 \2] – ",
-                              text, flags=re.IGNORECASE | re.UNICODE)
-                # place other letter and numerical cost symbols
-                text = re.sub(r"《([a-z0-9])》", sub_encircle, text, flags=re.IGNORECASE | re.UNICODE)
-                # remove empty formatting hints
-                text = re.sub(r"\[\[[a-z]]]\s*\[\[/]]\s*", r" ", text, flags=re.IGNORECASE | re.UNICODE)
-                # replace formatting hints with brackets
-                text = re.sub(r"\[\[[a-z]]]([^\[]*?)\s*\[\[/]]\s*", r"[\1] ", text, flags=re.IGNORECASE | re.UNICODE)
-                # relocate misplaced spaces
-                text = re.sub(r"(\[[^]]*?)\s+(])\s*", r"\1\2 ", text, flags=re.IGNORECASE | re.UNICODE)
-                text = re.sub(r"\s*(\[)\s+([^]]*?])", r" \1\2", text, flags=re.IGNORECASE | re.UNICODE)
-                # place line breaks
-                return re.sub(r"\s*\[\[br]]\s*", "\n\n", text, flags=re.IGNORECASE | re.UNICODE)
-
-            content = {
-                language: CardContent(load_name(language), load_text(language), "")
-                for language in API_LANGS
-            }
-
             return cls(
                 code=Code(data["Code"]),
                 elements=[
-                    Card.__ELEMENTS_MAP[element]
+                    _ELEMENTS_MAP[element]
                     for element in data["Element"].split("/")
                 ],
-                content=content,
+                content={
+                    language: CardContent(
+                        _load_name(language, data),
+                        _load_text(language, data),
+                        ""
+                    )
+                    for language in API_LANGS
+                },
             )
 
     def __repr__(self) -> str:

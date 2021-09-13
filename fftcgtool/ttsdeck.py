@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+from typing import Any
 
 from .carddb import CardDB
 from .cards import Cards
@@ -44,7 +45,7 @@ class TTSDeck(Cards):
     def file_name(self) -> str:
         return f"{super().file_name}.json"
 
-    def get_tts_object(self, language: Language) -> dict[str, any]:
+    def get_tts_object(self, language: Language) -> dict[str, Any]:
         carddb = CardDB()
 
         # unique face urls used
