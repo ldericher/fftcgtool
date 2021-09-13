@@ -137,7 +137,7 @@ class RWCardDB(CardDB):
                 card.sqlite_save(cursor)
 
             cursor.executemany("""
-                UPDATE INTO `faces_urls` (`face`, `url`)
+                INSERT OR IGNORE INTO `faces_urls` (`face`, `url`)
                 VALUES(?, ?)
             """, self._face_to_url.items())
 

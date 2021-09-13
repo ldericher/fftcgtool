@@ -136,12 +136,12 @@ class Card:
 
     def sqlite_save(self, cursor: sqlite3.Cursor) -> None:
         cursor.execute("""
-            UPDATE INTO `cards_indices` (`code`, `index`)
+            INSERT OR IGNORE INTO `cards_indices` (`code`, `index`)
             VALUES (?, ?)
         """, (self.code.short, self.index))
 
         cursor.executemany("""
-            UPDATE INTO `cards_content` (`code`, `language`, `name`, `text`, `face`)
+            INSERT OR IGNORE INTO `cards_content` (`code`, `language`, `name`, `text`, `face`)
             VALUES(?, ?, ?, ?, ?)
         """, (
             (self.code.short, language.short, content.name, content.text, content.face)
@@ -149,7 +149,7 @@ class Card:
         ))
 
         cursor.executemany("""
-            UPDATE INTO `cards_elements` (`code`, `element`)
+            INSERT OR IGNORE INTO `cards_elements` (`code`, `element`)
             VALUES (?, ?)
         """, (
             (self.code.short, element)
