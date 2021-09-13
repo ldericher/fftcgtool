@@ -8,6 +8,7 @@ import requests
 
 from .code import Code
 from .ttsdeck import TTSDeck
+from .utils import int_default
 
 
 def _sort_cards_by_type(data: dict[str, str | int]) -> int:
@@ -62,8 +63,8 @@ class FFDecks(list[TTSDeck]):
             card_data = [{
                 "code": card["card"]["serial_number"],
                 "type": card["card"]["type"],
-                "cost": int(card["card"]["cost"]),
-                "count": int(card["quantity"]),
+                "cost": int_default(card["card"]["cost"], 0),
+                "count": int_default(card["quantity"], 0),
             } for card in res.json()["cards"]]
 
             # sort cards by type, then by cost

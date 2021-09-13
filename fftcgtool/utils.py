@@ -56,3 +56,10 @@ def grid_paste(page: Image.Image, index: int, card: Image.Image) -> None:
     w, h = card.size
     position = (index % GRID.x) * w, (index // GRID.x) * h
     page.paste(card, position)
+
+
+def int_default(integer: str, default: int) -> int:
+    try:
+        return int(integer)
+    except ValueError:
+        return default
