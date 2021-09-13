@@ -81,7 +81,7 @@ class CardDB:
 
 
 class RWCardDB(CardDB):
-    __db_path: PathLike[str]
+    __db_path: str | PathLike[str]
 
     def __new__(cls, *more) -> RWCardDB:
         if CardDB._instance is None:
