@@ -1,5 +1,5 @@
+import dataclasses
 import logging
-from dataclasses import replace
 from typing import Callable, Iterable
 
 import requests
@@ -75,7 +75,7 @@ class Opus(Cards):
         for card in self:
             try:
                 for lang in API_LANGS:
-                    card[lang] = replace(card[lang], face=carddb[card.code][lang].face)
+                    card[lang] = dataclasses.replace(card[lang], face=carddb[card.code][lang].face)
 
             except KeyError:
                 pass

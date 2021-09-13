@@ -1,6 +1,6 @@
+import dataclasses
 import logging
 import os
-from dataclasses import replace
 
 from PIL import Image
 
@@ -48,7 +48,7 @@ class Book:
             # set card indices
             for i, card in enumerate(page_cards):
                 card.index = i
-                card[language] = replace(card[language], face=file_name)
+                card[language] = dataclasses.replace(card[language], face=file_name)
 
             # save page
             self.__pages.append({
