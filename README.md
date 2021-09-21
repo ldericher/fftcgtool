@@ -1,5 +1,7 @@
 # fftcgtool
 
+[![Build Status](https://github.drone.yavook.de/api/badges/ldericher/fftcgtool/status.svg)](https://github.drone.yavook.de/ldericher/fftcgtool)
+
 Card import tool for [Final Fantasy TCG Complete](https://steamcommunity.com/sharedfiles/filedetails/?id=889160751) mod
 for the [Tabletop Simulator](http://berserk-games.com/tabletop-simulator/)
 
