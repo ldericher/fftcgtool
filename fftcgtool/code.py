@@ -11,7 +11,7 @@ class Code:
     rarity: str = field(init=False, compare=False)
     code_init: InitVar[str] = field(default="")
 
-    __RE = re.compile(r"([1-9][0-9]*|PR|B)-([0-9]+)([CRHLS]?)", flags=re.UNICODE)
+    __RE = re.compile(r"([1-9][0-9]*|PR|B|C)-([0-9]+)([CRHLS]?)", flags=re.UNICODE)
 
     def __post_init__(self, code_init: str):
         match = Code.__RE.match(code_init)

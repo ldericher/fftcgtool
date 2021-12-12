@@ -56,17 +56,19 @@ class Opus(Cards):
         # get cards from square api
         req = requests.post(Opus.__SQUARE_API_URL, json=params)
         carddb = CardDB()
-        cards = [
+        cards = (
             Card.from_square_api_data(card_data)
             for card_data in req.json()["cards"]
+        )
+
+        cards = [
+            card
+            for card in cards
+            if card.code.opus == self.__number or not card.code.opus.isnumeric()
         ]
 
         # remove reprints
-        super().__init__(name, [
-            card
-            for card in cards
-            if card.code.opus == self.__number
-        ])
+        super().__init__(name, cards)
 
         # sort cards by opus, then serial
         self.sort(key=lambda x: x.code.serial)
@@ -114,7 +116,7 @@ class Opus(Cards):
                 # light/darkness elemental deck
                 "Light-Darkness": lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
                 # multi element deck
-                "Multi": lambda card: len(card.elements) > 1,
+                "Multi": lambda card: "Crystal" in card.elements or len(card.elements) > 1,
             }
 
             # sort cards by element, then alphabetically

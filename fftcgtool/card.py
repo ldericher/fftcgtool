@@ -17,11 +17,11 @@ class CardContent:
 
 
 _ELEMENTS_JAP = [
-    "火", "氷", "風", "土", "雷", "水", "光", "闇"
+    "火", "氷", "風", "土", "雷", "水", "光", "闇",
 ]
 
 _ELEMENTS_ENG = [
-    "Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Darkness"
+    "Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Darkness",
 ]
 
 _ELEMENTS_MAP = {
@@ -49,6 +49,8 @@ def _load_text(language: Language, data: dict) -> str:
     text = text.replace("《S》", encircle_symbol("S", False))
     # place elemental cost symbols
     text = re.sub(rf"《([{''.join(_ELEMENTS_JAP)}])》", _sub_elements, text, flags=re.UNICODE)
+    # place crystal symbols
+    text = text.replace("《C》", "⟠")
     # place dull symbols
     text = text.replace("《ダル》", "[⤵]")
     # relocate misplaced line break markers
@@ -93,20 +95,37 @@ class Card:
             )
 
         else:
-            return cls(
-                code=Code(data["Code"]),
-                elements=[
-                    _ELEMENTS_MAP[element]
-                    for element in data["Element"].split("/")
-                ],
-                content={
+            code = Code(data["Code"])
+
+            if code.opus == "C":
+                elements = ["Crystal"]
+                content = {
                     language: CardContent(
-                        _load_name(language, data),
-                        _load_text(language, data),
-                        ""
+                        name="⟠",
+                        text="",
+                        face="",
                     )
                     for language in API_LANGS
-                },
+                }
+
+            else:
+                elements = [
+                    _ELEMENTS_MAP[element]
+                    for element in data["Element"].split("/")
+                ]
+                content = {
+                    language: CardContent(
+                        name=_load_name(language, data),
+                        text=_load_text(language, data),
+                        face="",
+                    )
+                    for language in API_LANGS
+                }
+
+            return cls(
+                code=code,
+                elements=elements,
+                content=content,
             )
 
     def __repr__(self) -> str:
