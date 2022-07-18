@@ -8,7 +8,7 @@ import roman
 from .card import Card
 from .carddb import CardDB
 from .cards import Cards
-from .language import Language, API_LANGS
+from .language import API_LANGS, Language
 from .ttsdeck import TTSDeck
 
 
