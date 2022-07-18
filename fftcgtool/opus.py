@@ -63,6 +63,7 @@ class Opus(Cards):
             params["text"] = ""
 
         # get cards from square api
+        logger.debug(f"POST params: {params}")
         req = requests.post(Opus.__SQUARE_API_URL, json=params)
         carddb = CardDB()
         cards = (
@@ -123,7 +124,7 @@ class Opus(Cards):
 
             filters |= {
                 # light/darkness elemental deck
-                "Light-Darkness": lambda card: card.elements == ["Light"] or card.elements == ["Darkness"],
+                "Light-Darkness": lambda card: card.elements in (["Light"], ["Darkness"]),
                 # multi element deck
                 "Multi": lambda card: "Crystal" in card.elements or len(card.elements) > 1,
             }
