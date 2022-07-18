@@ -42,6 +42,10 @@ def _load_name(language: Language, data: dict[str, Any]) -> str:
     return data[f"Name{language.key_suffix}"]
 
 
+def _load_type(language: Language, data: dict[str, Any]) -> str:
+    return data[f"Type{language.key_suffix}"]
+
+
 def _load_text(language: Language, data: dict) -> str:
     # load text
     text = str(data[f"Text{language.key_suffix}"])
@@ -50,7 +54,7 @@ def _load_text(language: Language, data: dict) -> str:
     # place elemental cost symbols
     text = re.sub(rf"《([{''.join(_ELEMENTS_JAP)}])》", _sub_elements, text, flags=re.UNICODE)
     # place crystal symbols
-    text = text.replace("《C》", "⟠")
+    text = text.replace("《C》", "♦")
     # place dull symbols
     text = text.replace("《ダル》", "[⤵]")
     # relocate misplaced line break markers
@@ -101,7 +105,7 @@ class Card:
                 elements = ["Crystal"]
                 content = {
                     language: CardContent(
-                        name="⟠",
+                        name=_load_type(language, data),
                         text="",
                         face="",
                     )
