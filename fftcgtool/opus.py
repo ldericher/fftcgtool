@@ -23,7 +23,16 @@ class Opus(Cards):
         if opus_id.isnumeric():
             name = f"Opus {opus_id} ({self.__language.short})"
             self.__number = opus_id
-            params = {"set": [f"Opus {roman.toRoman(int(opus_id)).upper()}"]}
+
+            if (opus_id := int(opus_id)) <= 14:
+                params = {"set": [f"Opus {roman.toRoman(opus_id).upper()}"]}
+
+            else:
+                opus_map = {
+                    15: "Crystal Dominion",
+                    16: "Emissaries of Light",
+                }
+                params = {"set": [opus_map[opus_id]]}
 
         elif opus_id == "chaos":
             name = f"Boss Deck Chaos ({self.__language.short})"
