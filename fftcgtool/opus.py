@@ -31,6 +31,7 @@ class Opus(Cards):
                 opus_map = {
                     15: "Crystal Dominion",
                     16: "Emissaries of Light",
+                    17: "Rebellion's Call",
                 }
                 params = {"set": [opus_map[opus_id]]}
 

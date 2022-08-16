@@ -3,7 +3,7 @@ authors = ["LDericher <40151420+ldericher@users.noreply.github.com>"]
 description = "Card import tool for 'Final Fantasy TCG Complete' mod for the 'Tabletop Simulator' game"
 license = "LICENSE"
 name = "fftcgtool"
-version = "0.2.0"
+version = "0.2.1"
 
 [tool.poetry.dependencies]
 Pillow = "^9.2.0"
