@@ -32,6 +32,9 @@ class Opus(Cards):
                     15: "Crystal Dominion",
                     16: "Emissaries of Light",
                     17: "Rebellion's Call",
+                    18: "Resurgence of Power",
+                    19: "From Nightmares",
+                    20: "Beyond Destiny"
                 }
                 params = {"set": [opus_map[opus_id]]}
 
